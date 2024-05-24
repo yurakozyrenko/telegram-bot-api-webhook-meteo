@@ -12,4 +12,7 @@ export class User {
     transformer: bigintTransformer,
   })
   chatId: number;
+
+  @Column({ type: 'varchar', length: 20 })
+  city: string;
 }

@@ -19,7 +19,9 @@ export class BotService {
   ) {
     this.messageHandlers = {
       [actions.START]: async (chatId: number) => {
-        await this.usersService.createUser({ chatId });
+        
+        const city = 'минск';
+        await this.usersService.createUser({ chatId, city });
         await this.bot.sendMessage(chatId, messages.START);
       },
       default: async (chatId: number, message: string) => {
@@ -39,11 +41,9 @@ export class BotService {
   @Cron(cronTime, { timeZone: cronTimezone })
   async sendMeteo() {
     const users = await this.usersService.getAllUsers();
-    const city = 'минск';
-
-    const meteoData = await getMeteoData(city);
 
     for (const user of users) {
+      const meteoData = await getMeteoData(user.city);
       await this.bot.sendMessage(user.chatId, meteoData);
     }
   }

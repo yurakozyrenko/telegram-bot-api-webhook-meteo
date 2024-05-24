@@ -4,14 +4,14 @@ async function getMeteoData(message: string): Promise<string> {
   try {
     const cityName = encodeURIComponent(message);
 
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=ebe6dde1400a7c49d0fa1b9a02ee2a10`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${process.env.API_KEY}`;
 
     const response = await axios.get(url);
 
     const data = response.data;
 
     const weatherType = data.weather[0].id;
-    
+
     const temtemperature = data.main.temp;
 
     let emojiIcon = '';
