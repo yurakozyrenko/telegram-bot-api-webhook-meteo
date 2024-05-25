@@ -1,17 +1,20 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { BotProvider } from './bot.provider';
 import { actions, messages, cities, times } from './bot.constants';
-import { Cron } from '@nestjs/schedule';
-import { cronTime, cronTimezone } from 'src/utils/consts';
+// import { Cron } from '@nestjs/schedule';
+import * as cron from 'node-cron';
+// import { cronTime, cronTimezone } from 'src/utils/consts';
 import getMeteoData from 'src/utils/getMeteo';
 import { UsersService } from 'src/users/users.service';
+import convertTimeToCron from 'src/utils/timeToCronValue';
 
 @Injectable()
-export class BotService {
+export class BotService implements OnModuleInit, OnModuleDestroy {
   private messageHandlers: Record<
     string,
     (chatId: number, message: string) => Promise<void>
   >;
+  private userTasks: Map<number, cron.ScheduledTask>;
 
   constructor(
     private readonly bot: BotProvider,
@@ -38,7 +41,8 @@ export class BotService {
           chatId,
           `${messages.TIME_CONFIRMED} ${time}`,
         );
-        // this.scheduleDailyMessage(chatId, time); // Планирование сообщения на указанное время
+        const user = await this.usersService.getUserByChatId(chatId);
+        this.scheduleUserTask(chatId, time, user.city);
       },
 
       default: async (chatId: number, message: string) => {
@@ -46,22 +50,47 @@ export class BotService {
         await this.bot.sendMessage(chatId, meteoData);
       },
     };
+    // Инициализация userTasks в конструкторе
+    this.userTasks = new Map();
+  }
+
+  // Реализация метода OnModuleInit
+  async onModuleInit() {
+    await this.scheduleUserTasks();
+  }
+
+  // Реализация метода OnModuleDestroy
+  async onModuleDestroy() {
+    this.userTasks.forEach((task) => task.stop());
+  }
+
+  // Метод для запуска задач для всех пользователей при инициализации модуля
+  private async scheduleUserTasks() {
+    const users = await this.usersService.getAllUsers();
+    for (const user of users) {
+      this.scheduleUserTask(user.chatId, user.time, user.city);
+    }
+  }
+
+  // Метод для планирования задачи для конкретного пользователя
+  private scheduleUserTask(chatId: number, time: string, city: string) {
+    if (this.userTasks.has(chatId)) {
+      this.userTasks.get(chatId).stop();
+    }
+
+    const cronTime = convertTimeToCron(time);
+    const task = cron.schedule(cronTime, async () => {
+      const meteoData = await getMeteoData(city);
+      await this.bot.sendMessage(chatId, meteoData);
+    });
+
+    this.userTasks.set(chatId, task);
   }
 
   async sendMessage(chatId: number, message: string) {
     const handler =
       this.messageHandlers[message] || this.messageHandlers.default;
     await handler(chatId, message);
-  }
-
-  @Cron(cronTime, { timeZone: cronTimezone })
-  async sendMeteo() {
-    const users = await this.usersService.getAllUsers();
-
-    for (const user of users) {
-      const meteoData = await getMeteoData(user.city);
-      await this.bot.sendMessage(user.chatId, meteoData);
-    }
   }
 
   async sendCitySelection(chatId: number) {
@@ -89,16 +118,21 @@ export class BotService {
   }
 
   async handleCallbackQuery(callbackQuery: any) {
-
-    const [action, data] = callbackQuery.data.split(':');
+    const [action] = callbackQuery.data.split(':');
     const chatId = callbackQuery.message.chat.id;
 
     if (action === actions.SELECT_CITY) {
-      await this.messageHandlers[actions.SELECT_CITY](chatId, data);
+      const [, city] = callbackQuery.data.split(':');
+      await this.messageHandlers[actions.SELECT_CITY](chatId, city);
     }
 
     if (action === actions.SELECT_TIME) {
-      await this.messageHandlers[actions.SELECT_TIME](chatId, data);
+      const [, hours, minutes] = callbackQuery.data.split(':');
+
+      await this.messageHandlers[actions.SELECT_TIME](
+        chatId,
+        `${hours}:${minutes}`,
+      );
     }
   }
 }
