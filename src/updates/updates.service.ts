@@ -8,11 +8,19 @@ export class UpdatesService {
 
   constructor(private readonly botService: BotService) {}
 
-  async handleUpdate({ message }: Update) {
-    const { from } = message;
-    const { id: chatId } = from;
-    const chatType = message.chat.type;
-    if (chatType === 'private') return this.handleMessage(chatId, message);
+  async handleUpdate(update: Update) {
+    if (update.message) {
+      const { from } = update.message;
+      const { id: chatId } = from;
+      const chatType = update.message.chat.type;
+
+      if (chatType === 'private')
+        return this.handleMessage(chatId, update.message);
+    }
+
+    if (update.callback_query) {
+      await this.botService.handleCallbackQuery(update.callback_query);
+    }
   }
 
   async handleMessage(chatId: number, message: Message) {

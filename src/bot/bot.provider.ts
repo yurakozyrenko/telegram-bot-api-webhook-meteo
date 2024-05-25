@@ -14,7 +14,7 @@ export class BotProvider implements OnModuleInit {
   private readonly bot: TelegramBot;
   private readonly logger: LoggerService = new Logger(BotProvider.name);
   private readonly botToken: string;
-  private readonly allowedBotUpdates: string[] = ['message'];
+  private readonly allowedBotUpdates: string[] = ['message', 'callback_query'];
   private readonly telegramBotApiUrl = 'https://api.telegram.org/bot';
 
   constructor(
@@ -28,8 +28,8 @@ export class BotProvider implements OnModuleInit {
     ]);
   }
 
-  async sendMessage(chatId: number, message: string) {
-    await this.bot.sendMessage(chatId, message);
+  async sendMessage(chatId: number, message: string, options?: any) {
+    await this.bot.sendMessage(chatId, message, options);
   }
 
   async onModuleInit() {

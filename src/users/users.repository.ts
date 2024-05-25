@@ -30,14 +30,14 @@ export class UsersRepository {
       .createQueryBuilder('users')
       .update(User)
       .set(updateUserDto)
-      .where('users.chatId = :chatId', { chatId: `"${chatId}"` })
+      .where('users.chat_id = :chatId', { chatId })
       .execute();
   }
 
   async getUserByChatId(chatId: number): Promise<User> {
     return await this.usersRepository
       .createQueryBuilder('users')
-      .where('users.chatId = :chatId', { chatId: `"${chatId}"` })
+      .where('users.chat_id = :chatId', { chatId })
       .getOne();
   }
 

@@ -15,4 +15,7 @@ export class User {
 
   @Column({ type: 'varchar', length: 20 })
   city: string;
+
+  @Column({ nullable: true })
+  time: string; // Время для рассылки, может быть null если не выбрано
 }

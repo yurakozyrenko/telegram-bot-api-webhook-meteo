@@ -10,4 +10,7 @@ export class UserDto {
   @IsString()
   @Length(1, 20)
   city: User['city'];
+
+  @IsString()
+  time: User['time'];
 }

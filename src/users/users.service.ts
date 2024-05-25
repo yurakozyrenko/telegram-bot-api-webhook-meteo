@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/createUser.dto';
 import { UsersRepository } from './users.repository';
+import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UsersService {
@@ -17,10 +18,10 @@ export class UsersService {
     this.logger.debug(`user successfully created with id: ${raw[0].id}`);
   }
 
-  async updateUser(chatId: number, city: string) {
+  async updateUser(chatId: number, { time }: UpdateUserDto) {
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
-    const user = this.usersRepository.getUserByChatId(chatId);
+    const user = await this.usersRepository.getUserByChatId(chatId);
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
@@ -30,16 +31,16 @@ export class UsersService {
       );
     }
 
+    const { city } = user;
+
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
+      time,
     });
 
     this.logger.debug(
       `${affected} user successfully updated by chatId: ${chatId}`,
     );
-
-    // user.city = city;
-    // this.users.set(chatId, user);
   }
 
   async getUserByChatId(chatId: number) {
