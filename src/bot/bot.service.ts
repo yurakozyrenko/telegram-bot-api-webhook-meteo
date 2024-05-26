@@ -56,7 +56,8 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       },
 
       default: async (chatId: number, message: string) => {
-        await this.bot.sendMessage(chatId, 'Привеет, чем могу помочь?');
+        const meteoData = await getMeteoData(message);
+        await this.bot.sendMessage(chatId, meteoData);
       },
     };
     this.userTasks = new Map();
@@ -77,7 +78,7 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private scheduleUserTask(chatId: number, time: string, city: string) {
+  private async scheduleUserTask(chatId: number, time: string, city: string) {
     if (this.userTasks.has(chatId)) {
       this.userTasks.get(chatId).stop();
     }
