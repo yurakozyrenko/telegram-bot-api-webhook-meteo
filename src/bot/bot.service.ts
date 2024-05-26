@@ -1,12 +1,13 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { BotProvider } from './bot.provider';
-import { actions, messages, cities, times } from './bot.constants';
-// import { Cron } from '@nestjs/schedule';
+import { actions, messages } from './bot.constants';
 import * as cron from 'node-cron';
-// import { cronTime, cronTimezone } from 'src/utils/consts';
 import getMeteoData from 'src/utils/getMeteo';
 import { UsersService } from 'src/users/users.service';
+
 import convertTimeToCron from 'src/utils/timeToCronValue';
+import sendCitySelection from 'src/utils/sendCitySelection';
+import sendTimeSelection from 'src/utils/sendTimeSelection';
 
 @Injectable()
 export class BotService implements OnModuleInit, OnModuleDestroy {
@@ -23,7 +24,12 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     this.messageHandlers = {
       [actions.START]: async (chatId: number) => {
         await this.bot.sendMessage(chatId, messages.START);
-        await this.sendCitySelection(chatId);
+
+        const inlineKeyboard = sendCitySelection();
+
+        await this.bot.sendMessage(chatId, messages.CITY_SELECTION, {
+          reply_markup: inlineKeyboard,
+        });
       },
 
       [actions.SELECT_CITY]: async (chatId: number, city: string) => {
@@ -32,7 +38,11 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
           chatId,
           `${messages.CITY_CONFIRMED} ${city}`,
         );
-        await this.sendTimeSelection(chatId);
+        const inlineKeyboard = sendTimeSelection();
+
+        await this.bot.sendMessage(chatId, messages.TIME_SELECTION, {
+          reply_markup: inlineKeyboard,
+        });
       },
 
       [actions.SELECT_TIME]: async (chatId: number, time: string) => {
@@ -46,25 +56,20 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       },
 
       default: async (chatId: number, message: string) => {
-        const meteoData = await getMeteoData(message);
-        await this.bot.sendMessage(chatId, meteoData);
+        await this.bot.sendMessage(chatId, 'Привеет, чем могу помочь?');
       },
     };
-    // Инициализация userTasks в конструкторе
     this.userTasks = new Map();
   }
 
-  // Реализация метода OnModuleInit
   async onModuleInit() {
     await this.scheduleUserTasks();
   }
 
-  // Реализация метода OnModuleDestroy
   async onModuleDestroy() {
     this.userTasks.forEach((task) => task.stop());
   }
 
-  // Метод для запуска задач для всех пользователей при инициализации модуля
   private async scheduleUserTasks() {
     const users = await this.usersService.getAllUsers();
     for (const user of users) {
@@ -72,7 +77,6 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  // Метод для планирования задачи для конкретного пользователя
   private scheduleUserTask(chatId: number, time: string, city: string) {
     if (this.userTasks.has(chatId)) {
       this.userTasks.get(chatId).stop();
@@ -91,30 +95,6 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
     const handler =
       this.messageHandlers[message] || this.messageHandlers.default;
     await handler(chatId, message);
-  }
-
-  async sendCitySelection(chatId: number) {
-    const inlineKeyboard = {
-      inline_keyboard: cities.map((city) => [
-        { text: city, callback_data: `${actions.SELECT_CITY}:${city}` },
-      ]),
-    };
-
-    await this.bot.sendMessage(chatId, messages.CITY_SELECTION, {
-      reply_markup: inlineKeyboard,
-    });
-  }
-
-  async sendTimeSelection(chatId: number) {
-    const inlineKeyboard = {
-      inline_keyboard: times.map((time) => [
-        { text: time, callback_data: `${actions.SELECT_TIME}:${time}` },
-      ]),
-    };
-
-    await this.bot.sendMessage(chatId, messages.TIME_SELECTION, {
-      reply_markup: inlineKeyboard,
-    });
   }
 
   async handleCallbackQuery(callbackQuery: any) {

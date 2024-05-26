@@ -15,10 +15,14 @@ export class UpdatesService {
       const chatType = update.message.chat.type;
 
       if (chatType === 'private')
-        return this.handleMessage(chatId, update.message);
+        this.logger.log(`Handling private message from chatId: ${chatId}`);
+      return await this.handleMessage(chatId, update.message);
     }
 
     if (update.callback_query) {
+      this.logger.log(
+        `Handling callback query from chatId: ${update.callback_query.from.id}`,
+      );
       await this.botService.handleCallbackQuery(update.callback_query);
     }
   }
