@@ -10,7 +10,7 @@ import sendCitySelection from 'src/utils/sendCitySelection';
 import sendTimeSelection from 'src/utils/sendTimeSelection';
 
 @Injectable()
-export class BotService implements OnModuleInit, OnModuleDestroy {
+export class BotService {
   private messageHandlers: Record<
     string,
     (chatId: number, message: string) => Promise<void>
