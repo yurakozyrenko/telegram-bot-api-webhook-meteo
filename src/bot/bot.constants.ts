@@ -1,13 +1,18 @@
 export const messages = {
   START: 'Welcome!',
-  CITY_SELECTION: 'Please enter the name of your city:',
-  CITY_CONFIRMED: 'Your city has been set to ',
-  TIME_SELECTION: 'Выберите время для ежедневной рассылки:',
-  TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на:',
+  INFO: 'INFO',
+  CITY_SELECTION: 'Пожалуйста, введите название вашего города: ',
+  CITY_CONFIRMED: 'Ваш город настроен на: ',
+  TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
+  TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на: ',
+  EDIT_CITY: 'Выберите новый город для ежедневной рассылки: ',
+
 };
 
 export const actions = {
   START: '/start',
+  INFO: '/info',
+  EDIT: '/edit',
   SELECT_CITY: 'select_city',
   SELECT_TIME: 'select_time',
 };

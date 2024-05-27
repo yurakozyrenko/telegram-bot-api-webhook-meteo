@@ -23,6 +23,16 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
   ) {
     this.messageHandlers = {
       [actions.START]: async (chatId: number) => {
+        const user = await this.usersService.getUserByChatId(chatId);
+
+        if (user) {
+          await this.bot.sendMessage(
+            chatId,
+            `Ваши данные уже сохранены. Хотите изменить город или время? Используйте команду /edit.`,
+          );
+          return;
+        }
+
         await this.bot.sendMessage(chatId, messages.START);
 
         const inlineKeyboard = sendCitySelection();
@@ -33,7 +43,11 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       },
 
       [actions.SELECT_CITY]: async (chatId: number, city: string) => {
-        await this.usersService.createUser({ chatId, city });
+        const user = await this.usersService.getUserByChatId(chatId);
+        user
+          ? await this.usersService.createUser({ chatId, city })
+          : await this.usersService.updateUserCity(chatId, { city });
+
         await this.bot.sendMessage(
           chatId,
           `${messages.CITY_CONFIRMED} ${city}`,
@@ -46,18 +60,41 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
       },
 
       [actions.SELECT_TIME]: async (chatId: number, time: string) => {
-        await this.usersService.updateUser(chatId, { time });
-        await this.bot.sendMessage(
-          chatId,
-          `${messages.TIME_CONFIRMED} ${time}`,
-        );
+        await this.usersService.updateUserTime(chatId, { time });
         const user = await this.usersService.getUserByChatId(chatId);
         this.scheduleUserTask(chatId, time, user.city);
+        await this.bot.sendMessage(
+          chatId,
+          `${messages.CITY_CONFIRMED} ${user.city} ${messages.TIME_CONFIRMED} ${time}`,
+        );
+      },
+
+      [actions.INFO]: async (chatId: number) => {
+        const user = await this.usersService.getUserByChatId(chatId);
+
+        if (!user) {
+          await this.bot.sendMessage(
+            chatId,
+            `Заполните сначала поля выбора города и время`,
+          );
+          return;
+        }
+
+        const { city, time } = user;
+        await this.bot.sendMessage(
+          chatId,
+          `${messages.CITY_CONFIRMED} ${city} ${messages.TIME_CONFIRMED} ${time}`,
+        );
+      },
+
+      [actions.EDIT]: async (chatId: number) => {
+        await this.bot.sendMessage(chatId, messages.EDIT_CITY, {
+          reply_markup: sendCitySelection(),
+        });
       },
 
       default: async (chatId: number, message: string) => {
-        const meteoData = await getMeteoData(message);
-        await this.bot.sendMessage(chatId, meteoData);
+        await this.bot.sendMessage(chatId, 'Привет, чем могу помочь?');
       },
     };
     this.userTasks = new Map();
