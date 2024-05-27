@@ -44,9 +44,11 @@ export class BotService implements OnModuleInit, OnModuleDestroy {
 
       [actions.SELECT_CITY]: async (chatId: number, city: string) => {
         const user = await this.usersService.getUserByChatId(chatId);
-        user
-          ? await this.usersService.createUser({ chatId, city })
-          : await this.usersService.updateUserCity(chatId, { city });
+        if (!user) {
+          await this.usersService.createUser({ chatId, city });
+        } else {
+          await this.usersService.updateUserCity(chatId, { city });
+        }
 
         await this.bot.sendMessage(
           chatId,
