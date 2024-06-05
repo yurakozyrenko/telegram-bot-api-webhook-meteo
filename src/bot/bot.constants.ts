@@ -6,7 +6,6 @@ export const messages = {
   TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
   TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на: ',
   EDIT_CITY: 'Выберите новый город для ежедневной рассылки: ',
-
 };
 
 export const actions = {

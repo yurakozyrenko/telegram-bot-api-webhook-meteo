@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BotProvider } from './bot.provider';
 import { actions, messages } from './bot.constants';
 import * as cron from 'node-cron';
@@ -95,7 +95,7 @@ export class BotService {
         });
       },
 
-      default: async (chatId: number, message: string) => {
+      default: async (chatId: number) => {
         await this.bot.sendMessage(chatId, 'Привет, чем могу помочь?');
       },
     };
