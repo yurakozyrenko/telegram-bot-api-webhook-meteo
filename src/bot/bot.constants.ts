@@ -1,20 +1,20 @@
-export const messages = {
-  START: 'Welcome!',
-  INFO: 'INFO',
-  CITY_SELECTION: 'Пожалуйста, введите название вашего города: ',
-  CITY_CONFIRMED: 'Ваш город настроен на: ',
-  TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
-  TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на: ',
-  EDIT_CITY: 'Выберите новый город для ежедневной рассылки: ',
-};
+export enum Messages {
+  START = 'Welcome!',
+  INFO = 'INFO',
+  CITY_SELECTION = 'Пожалуйста, введите название вашего города: ',
+  CITY_CONFIRMED = 'Ваш город настроен на: ',
+  TIME_SELECTION = 'Выберите время для ежедневной рассылки: ',
+  TIME_CONFIRMED = 'Время для ежедневной рассылки установлено на: ',
+  EDIT_CITY = 'Выберите новый город для ежедневной рассылки: ',
+}
 
-export const actions = {
-  START: '/start',
-  INFO: '/info',
-  EDIT: '/edit',
-  SELECT_CITY: 'select_city',
-  SELECT_TIME: 'select_time',
-};
+export enum Actions {
+  START = '/start',
+  INFO = '/info',
+  EDIT = '/edit',
+  SELECT_CITY = 'select_city',
+  SELECT_TIME = 'select_time',
+}
 
 export const cities = ['Минск', 'Гродно', 'Брест', 'Могилёв', 'Витебск', 'Гомель'];
 
