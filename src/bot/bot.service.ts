@@ -83,8 +83,9 @@ export class BotService {
         });
       },
 
-      default: async (chatId: number) => {
-        await this.bot.sendMessage(chatId, 'Привет, чем могу помочь?');
+      default: async (chatId: number, city: string) => {
+        const result = await getMeteoData(city);
+        await this.bot.sendMessage(chatId, result);
       },
     };
     this.userTasks = new Map();
