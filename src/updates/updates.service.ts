@@ -1,6 +1,7 @@
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { Message, Update } from 'node-telegram-bot-api';
-import { BotService } from 'src/bot/bot.service';
+
+import { BotService } from '../bot/bot.service';
 
 @Injectable()
 export class UpdatesService {
@@ -14,15 +15,12 @@ export class UpdatesService {
       const { id: chatId } = from;
       const chatType = update.message.chat.type;
 
-      if (chatType === 'private')
-        this.logger.log(`Handling private message from chatId: ${chatId}`);
+      if (chatType === 'private') this.logger.log(`Handling private message from chatId: ${chatId}`);
       return await this.handleMessage(chatId, update.message);
     }
 
     if (update.callback_query) {
-      this.logger.log(
-        `Handling callback query from chatId: ${update.callback_query.from.id}`,
-      );
+      this.logger.log(`Handling callback query from chatId: ${update.callback_query.from.id}`);
       await this.botService.handleCallbackQuery(update.callback_query);
     }
   }

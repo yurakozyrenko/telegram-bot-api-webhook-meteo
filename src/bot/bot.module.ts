@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 
 import { BotProvider } from './bot.provider';
 import { BotService } from './bot.service';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [HttpModule, UsersModule],

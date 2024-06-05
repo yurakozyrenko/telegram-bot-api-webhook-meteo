@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 
 import { CreateUserDto } from './dto/createUser.dto';
-import { UsersRepository } from './users.repository';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entity/users.entity';
+import { UsersRepository } from './users.repository';
 
 @Injectable()
 export class UsersService {
@@ -26,10 +26,7 @@ export class UsersService {
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
-      throw new HttpException(
-        `user with chatId: ${chatId} not exist`,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 
     const { time } = user;
@@ -39,9 +36,7 @@ export class UsersService {
       time,
     });
 
-    this.logger.debug(
-      `${affected} user successfully updated by chatId: ${chatId}`,
-    );
+    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
   }
 
   async updateUserTime(chatId: number, { time }: UpdateUserDto) {
@@ -51,10 +46,7 @@ export class UsersService {
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
-      throw new HttpException(
-        `user with chatId: ${chatId} not exist`,
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 
     const { city } = user;
@@ -64,9 +56,7 @@ export class UsersService {
       time,
     });
 
-    this.logger.debug(
-      `${affected} user successfully updated by chatId: ${chatId}`,
-    );
+    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
   }
 
   async getUserByChatId(chatId: number): Promise<User> {
