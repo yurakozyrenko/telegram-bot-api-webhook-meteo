@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import * as TelegramBot from 'node-telegram-bot-api';
 import { firstValueFrom } from 'rxjs';
 
+import { ParseModes } from './bot.constants';
+
 @Injectable()
 export class BotProvider implements OnModuleInit {
   private readonly bot: TelegramBot;
@@ -27,6 +29,21 @@ export class BotProvider implements OnModuleInit {
 
   async sendMessage(chatId: number, message: string, options?: any) {
     await this.bot.sendMessage(chatId, message, options);
+  }
+
+  async sendMessageAndKeyboard(chatId: number, text: string, keyboard: TelegramBot.KeyboardButton[][]) {
+    try {
+      await this.bot.sendMessage(chatId, text, {
+        reply_markup: {
+          keyboard,
+          one_time_keyboard: true,
+          resize_keyboard: true,
+        },
+        parse_mode: ParseModes.HTML,
+      });
+    } catch (error) {
+      this.logger.error(`Send message with keyboard to id - ${chatId} : ${error}`);
+    }
   }
 
   async onModuleInit() {

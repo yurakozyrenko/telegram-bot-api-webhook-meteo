@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 
 import { bigintTransformer } from '../../utils/bigintTransformer';
+import { UserState } from '../users.constants';
 
 @Entity({ name: 'users' })
 export class User {
@@ -18,4 +19,13 @@ export class User {
 
   @Column({ nullable: true })
   time: string; // Время для рассылки, может быть null если не выбрано
+
+  @Column({ type: 'enum', enum: UserState, default: null })
+  userState: UserState;
+
+  @CreateDateColumn({ type: 'timestamp without time zone' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ type: 'timestamp without time zone' })
+  updatedAt: Date;
 }

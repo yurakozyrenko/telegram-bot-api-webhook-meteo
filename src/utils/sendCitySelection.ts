@@ -1,11 +1,10 @@
-import { Actions, cities } from '../bot/bot.constants';
+import { cities } from '../bot/bot.constants';
+import { UserActions } from '../users/users.constants';
 
 function sendCitySelection() {
-  const inlineKeyboard = {
-    inline_keyboard: cities.map((city) => [{ text: city, callback_data: `${Actions.SELECT_CITY}:${city}` }]),
-  };
+  const keyboard = cities.map((city) => [{ text: city }]);
 
-  return inlineKeyboard;
+  return keyboard;
 }
 
 export default sendCitySelection;

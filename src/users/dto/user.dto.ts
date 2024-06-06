@@ -1,6 +1,7 @@
-import { IsInt, IsString, Length } from 'class-validator';
+import { IsEnum, IsInt, IsString, Length } from 'class-validator';
 
 import { User } from '../entity/users.entity';
+import { UserState } from '../users.constants';
 
 export class UserDto {
   @IsInt()
@@ -13,4 +14,7 @@ export class UserDto {
 
   @IsString()
   time: User['time'];
+
+  @IsEnum(UserState)
+  userState: User['userState'];
 }
