@@ -65,7 +65,6 @@ export class BotHandlersService {
   async waitingForApproveActionTime(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run waitingForApproveActionTime');
     await this.usersService.updateUserTime(chatId, { time: text, userState: UserState.START });
-
     await this.cronService.createCronJob({ chatId, time: text });
     await this.botService.sendMessage(chatId, `${messages.TIME_CONFIRMED} ${text}`);
     await this.handleCityAndTimeConfirmation(chatId);
@@ -101,7 +100,6 @@ export class BotHandlersService {
       return;
     }
     if (!time) {
-      await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city}`);
       await this.botService.sendMessage(chatId, messages.FILL_TIME_FIRST);
       return;
     }

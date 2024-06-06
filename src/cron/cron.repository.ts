@@ -17,16 +17,8 @@ export class CronRepository {
     return await this.cronEntityRepository.createQueryBuilder('cron').getManyAndCount();
   }
 
-  async getCronJobByNameAndTime(chatId: number, time: string): Promise<CronEntity> {
-    return await this.cronEntityRepository
-      .createQueryBuilder('cron')
-      .where('chatId = :chatId', { chatId })
-      .where('time = :time', { time })
-      .getOne();
-  }
-
-  async getCronJobById(id: number): Promise<CronEntity> {
-    return await this.cronEntityRepository.createQueryBuilder('cron').where('id = :id', { id }).getOne();
+  async getCronJobByChatId(chatId: number): Promise<CronEntity> {
+    return await this.cronEntityRepository.createQueryBuilder('cron').where('chat_id = :chatId', { chatId }).getOne();
   }
 
   async createCronJob(createCronJobDto: CreateCronJobDto): Promise<InsertResult> {
@@ -38,12 +30,12 @@ export class CronRepository {
       .execute();
   }
 
-  async updateCronJob(id: number, updateCronJobDto: UpdateCronJobDto): Promise<UpdateResult> {
+  async updateCronJob(chatId: number, updateCronJobDto: UpdateCronJobDto): Promise<UpdateResult> {
     return await this.cronEntityRepository
       .createQueryBuilder('cron')
       .update(CronEntity)
       .set(updateCronJobDto)
-      .where('id = :id', { id })
+      .where('chatId = :chatId', { chatId })
       .execute();
   }
 

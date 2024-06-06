@@ -61,7 +61,7 @@ export class CronService implements OnModuleInit {
   async deleteCronJob(id: CronEntity['id']) {
     this.logger.log(`trying to delete cron job with id: ${id}`);
 
-    const cronJobById = await this.cronRepository.getCronJobById(id);
+    const cronJobById = await this.cronRepository.getCronJobByChatId(id);
 
     if (!cronJobById) {
       this.logger.error(`CronJob with id: ${id} not exist`);
@@ -70,7 +70,7 @@ export class CronService implements OnModuleInit {
 
     const { affected } = await this.cronRepository.deleteCronJob(id);
 
-    // this.stopCronJob(cronJobById.chatId);
+    this.stopCronJob(cronJobById.chatId.toString());
     this.logger.log(`${affected} cron jobs successfully deleted with id: ${id}`);
   }
 
@@ -79,25 +79,28 @@ export class CronService implements OnModuleInit {
 
     this.logger.log(`trying to create cron job with time: ${time} and chatId: ${chatId}`);
 
-    const cronJobByNameAndTime = await this.cronRepository.getCronJobByNameAndTime(chatId, time);
+    const cronJobByChatId = await this.cronRepository.getCronJobByChatId(chatId);
 
-    if (cronJobByNameAndTime) {
-      this.logger.error(`CronJob with chatId: ${chatId} or time ${time} already exist`);
-      throw new HttpException(`CronJob with chatId: ${chatId} or time ${time} already exist`, HttpStatus.BAD_REQUEST);
+    console.log(cronJobByChatId);
+
+    if (!cronJobByChatId) {
+      const { raw } = await this.cronRepository.createCronJob(createCronJobDto);
+      this.addCronJob(chatId, time);
+      this.logger.log(`cron jobs successfully created with id: ${raw[0].id}`);
+    } else {
+      const { affected } = await this.cronRepository.updateCronJob(chatId, createCronJobDto);
+      this.stopCronJob(cronJobByChatId.chatId.toString());
+      this.addCronJob(chatId, time);
+      this.logger.log(`${affected} cron jobs successfully updated`);
     }
-
-    const { raw } = await this.cronRepository.createCronJob(createCronJobDto);
-
-    this.addCronJob(chatId, time);
-    this.logger.log(`cron jobs successfully created with id: ${raw[0].id}`);
   }
 
   async updateCronJob(id: CronEntity['id'], updateCronJobDto: UpdateCronJobDto) {
     this.logger.log('trying to update cron job');
 
-    const cronJobById = await this.cronRepository.getCronJobById(id);
+    const cronJobByChatId = await this.cronRepository.getCronJobByChatId(id);
 
-    if (!cronJobById) {
+    if (!cronJobByChatId) {
       this.logger.error(`CronJob with id: ${id} not exist`);
       throw new HttpException(`CronJob with id: ${id} not exist`, HttpStatus.BAD_REQUEST);
     }
@@ -105,7 +108,7 @@ export class CronService implements OnModuleInit {
     const { affected } = await this.cronRepository.updateCronJob(id, updateCronJobDto);
     const { chatId, time } = updateCronJobDto;
 
-    // this.stopCronJob(cronJobById.chatId);
+    this.stopCronJob(cronJobByChatId.chatId.toString());
     this.addCronJob(chatId, time);
     this.logger.log(`${affected} cron jobs successfully updated`);
   }
