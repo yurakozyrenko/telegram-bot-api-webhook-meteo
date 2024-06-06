@@ -10,6 +10,23 @@ export class UsersService {
   private readonly logger = new Logger(UsersService.name);
   constructor(private readonly usersRepository: UsersRepository) {}
 
+  async findOneByChatId(chatId: User['chatId']): Promise<User> {
+    this.logger.log(`Trying to user info by chatId: ${chatId}`);
+
+    const candidate = await this.usersRepository.findOneByChatId(chatId);
+
+    if (!candidate) {
+      const createUserDto = { chatId };
+      const newUser = await this.usersRepository.createUser(createUserDto);
+      this.logger.debug(`user successfully created with id: ${newUser.raw[0].id}`);
+      return newUser.raw[0];
+    }
+
+    this.logger.debug(`user successfully get by chatId: ${chatId}`);
+
+    return candidate;
+  }
+
   async createUser(createUserDto: CreateUserDto) {
     const { chatId } = createUserDto;
     this.logger.log(`Trying to create user chatId: ${chatId}`);
