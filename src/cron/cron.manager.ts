@@ -1,6 +1,6 @@
 import * as cron from 'node-cron';
 
-import { BotProvider } from './bot.provider';
+import { BotProvider } from '../bot/bot.provider';
 import getMeteoData from '../utils/getMeteo';
 import convertTimeToCron from '../utils/timeToCronValue';
 

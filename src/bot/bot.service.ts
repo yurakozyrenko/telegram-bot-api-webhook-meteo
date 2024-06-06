@@ -3,7 +3,7 @@ import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { Actions } from './bot.constants';
 import { BotHandlers } from './bot.handlers';
 import { BotProvider } from './bot.provider';
-import { CronManager } from './cron.manager';
+import { CronManager } from '../cron/cron.manager';
 import { UsersService } from '../users/users.service';
 
 @Injectable()

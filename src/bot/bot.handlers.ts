@@ -1,6 +1,6 @@
 import { Messages } from './bot.constants';
 import { BotProvider } from './bot.provider';
-import { CronManager } from './cron.manager';
+import { CronManager } from '../cron/cron.manager';
 import { UsersService } from '../users/users.service';
 import sendCitySelection from '../utils/sendCitySelection';
 import sendTimeSelection from '../utils/sendTimeSelection';
@@ -16,10 +16,7 @@ export class BotHandlers {
     const user = await this.usersService.getUserByChatId(chatId);
 
     if (user) {
-      await this.bot.sendMessage(
-        chatId,
-        `Ваши данные уже сохранены. Хотите изменить город или время? Используйте команду /edit.`,
-      );
+      await this.bot.sendMessage(chatId, Messages.ALREADY_SAVED);
       return;
     }
 
@@ -51,7 +48,7 @@ export class BotHandlers {
   async handleInfo(chatId: number): Promise<void> {
     const user = await this.usersService.getUserByChatId(chatId);
     if (!user) {
-      await this.bot.sendMessage(chatId, 'Заполните сначала поля выбора города и время');
+      await this.bot.sendMessage(chatId, Messages.FILL_CITY_TIME_FIRST);
       return;
     }
     const { city, time } = user;
@@ -63,6 +60,6 @@ export class BotHandlers {
   }
 
   async handleDefault(chatId: number): Promise<void> {
-    await this.bot.sendMessage(chatId, 'Привет, я умею отправлять погоду');
+    await this.bot.sendMessage(chatId, Messages.DEFAULT);
   }
 }
