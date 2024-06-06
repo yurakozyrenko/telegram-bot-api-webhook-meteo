@@ -81,8 +81,6 @@ export class CronService implements OnModuleInit {
 
     const cronJobByChatId = await this.cronRepository.getCronJobByChatId(chatId);
 
-    console.log(cronJobByChatId);
-
     if (!cronJobByChatId) {
       const { raw } = await this.cronRepository.createCronJob(createCronJobDto);
       this.addCronJob(chatId, time);
