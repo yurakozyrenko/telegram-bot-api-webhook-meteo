@@ -20,8 +20,6 @@ export class UsersService {
   }
 
   async updateUserCity(chatId: number, { city, userState }: UpdateUserDto) {
-    console.log(city, userState);
-
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
     const user = await this.usersRepository.getUserByChatId(chatId);

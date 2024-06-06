@@ -11,7 +11,7 @@ export class BotProvider implements OnModuleInit {
   private readonly bot: TelegramBot;
   private readonly logger: LoggerService = new Logger(BotProvider.name);
   private readonly botToken: string;
-  private readonly allowedBotUpdates: string[] = ['message', 'callback_query'];
+  private readonly allowedBotUpdates: string[] = ['message'];
   private readonly telegramBotApiUrl = 'https://api.telegram.org/bot';
 
   constructor(
@@ -23,7 +23,8 @@ export class BotProvider implements OnModuleInit {
     this.bot.setMyCommands([
       { command: 'start', description: 'Запустить бота' },
       { command: 'info', description: 'Информация' },
-      { command: 'edit', description: 'Редактировать данные' },
+      { command: 'edit_city', description: 'Редактировать город' },
+      { command: 'edit_time', description: 'Редактировать время' },
     ]);
   }
 

@@ -1,9 +1,9 @@
-import { times } from '../bot/bot.constants';
+// import { times } from '../bot/bot.constants';
 
-function sendTimeSelection() {
-  const keyboard = times.map((time) => [{ text: time }]);
+// function sendTimeSelection() {
+//   const keyboard = times.map((time) => [{ text: time }]);
 
-  return keyboard;
-}
+//   return keyboard;
+// }
 
-export default sendTimeSelection;
+// export default sendTimeSelection;

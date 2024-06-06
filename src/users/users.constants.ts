@@ -1,10 +1,10 @@
 export enum UserActions {
   START = '/start',
   INFO = '/info',
-  EDIT = '/edit',
+  EDIT_CITY = '/edit_city',
+  EDIT_TIME = '/edit_time',
   SELECT_CITY = 'select_city',
   SELECT_TIME = 'select_time',
-  DEFAULT = 'default',
 }
 
 export enum UserState {

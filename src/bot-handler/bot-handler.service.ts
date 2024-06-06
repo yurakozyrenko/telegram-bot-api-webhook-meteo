@@ -6,7 +6,6 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
-import sendCitySelection from '../utils/sendCitySelection';
 
 @Injectable()
 export class BotHandlersService {
@@ -22,10 +21,10 @@ export class BotHandlersService {
     this.userActions = {
       [UserActions.START]: async (text, user) => this.handleStart(text, user),
       [UserActions.INFO]: async (text, user) => this.handleInfo(text, user),
-      [UserActions.EDIT]: async (text, user) => this.handleEdit(text, user),
+      [UserActions.EDIT_TIME]: async (text, user) => this.handleEditTime(text, user),
+      [UserActions.EDIT_CITY]: async (text, user) => this.handleEditCity(text, user),
       [UserActions.SELECT_CITY]: async (text, user) => this.handleSelectCity(text, user),
       [UserActions.SELECT_TIME]: async (text, user) => this.handleSelectTime(text, user),
-      [UserActions.DEFAULT]: async (text, user) => this.handleDefault(text, user),
     };
   }
 
@@ -34,15 +33,22 @@ export class BotHandlersService {
 
     const { userState } = user;
 
-    console.log('userState', userState);
     console.log(text, user);
 
     if (userState === UserState.WAITING_FOR_APPROVE_CITY) {
-      console.log('111');
       return this.waitingForApproveActionCity(text, user);
     }
-    return;
-    // return this.userActions[text as UserActions](text, user);
+
+    if (userState === UserState.WAITING_FOR_APPROVE_TIME) {
+      return this.waitingForApproveActionTime(text, user);
+    }
+
+    const actionHandler = this.userActions[text as UserActions];
+
+    if (!actionHandler) {
+      return;
+    }
+    return actionHandler(text, user);
   }
 
   async handleStart(text: string, { chatId }: User) {
@@ -54,12 +60,16 @@ export class BotHandlersService {
 
   async waitingForApproveActionCity(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run waitingForApproveActionCity');
-    console.log('Привет1');
-    const message = `${messages.CITY_SELECTION}`;
-    const keyboard = sendCitySelection();
-    await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
-    await this.usersService.updateUserState(chatId, { userState: UserState.START });
-    this.logger.log('waitingForApproveAction successfully ended');
+    await this.usersService.updateUserCity(chatId, { city: text, userState: UserState.START });
+    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${text}`);
+    this.logger.log('waitingForApproveActionCity successfully ended');
+  }
+
+  async waitingForApproveActionTime(text: string, { chatId }: User): Promise<void> {
+    this.logger.log('run waitingForApproveActionTime');
+    await this.usersService.updateUserTime(chatId, { time: text, userState: UserState.START });
+    await this.botService.sendMessage(chatId, `${messages.TIME_CONFIRMED} ${text}`);
+    this.logger.log('waitingForApproveActionTime successfully ended');
   }
 
   async handleSelectCity(text: string, { chatId }: User): Promise<void> {
@@ -86,11 +96,20 @@ export class BotHandlersService {
     await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city} ${messages.TIME_CONFIRMED} ${time}`);
   }
 
-  async handleEdit(text: string, { chatId }: User): Promise<void> {
+  async handleEditCity(text: string, { chatId }: User): Promise<void> {
     console.log('edit');
     this.logger.log('run waitingForApproveActionCity');
-    await this.botService.sendMessage(chatId, messages.EDIT_CITY);
+    await this.botService.sendMessage(chatId, messages.CITY_SELECTION);
     await this.usersService.updateUserState(chatId, { userState: UserState.WAITING_FOR_APPROVE_CITY });
+    this.logger.log('waitingForApproveActionCity successfully ended');
+  }
+
+  async handleEditTime(text: string, { chatId }: User): Promise<void> {
+    console.log('edit');
+    this.logger.log('run waitingForApproveActionTime');
+    await this.botService.sendMessage(chatId, messages.TIME_SELECTION);
+    await this.usersService.updateUserState(chatId, { userState: UserState.WAITING_FOR_APPROVE_TIME });
+    this.logger.log('waitingForApproveActionTime successfully ended');
   }
 
   async handleDefault(text: string, { chatId }: User): Promise<void> {
