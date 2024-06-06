@@ -1,8 +1,9 @@
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { Message, Update } from 'node-telegram-bot-api';
-import { UsersService } from 'src/users/users.service';
+
 import { BotHandlersService } from '../bot-handler/bot-handler.service';
 import { User } from '../users/entity/users.entity';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class UpdatesService {
@@ -17,16 +18,20 @@ export class UpdatesService {
     const { from } = message;
     const { id: chatId } = from;
     const chatType = message.chat.type;
-    const user = await this.userService.getUserByChatId(chatId);
-    if (user && chatType === 'private') this.logger.log(`Handling private message from chatId: ${chatId}`);
-    return await this.handleMessage(message, user);
+    const candidate = await this.userService.getUserByChatId(chatId);
+    if (candidate && chatType === 'private') {
+      this.logger.log(`Handling private message from chatId: ${chatId}`);
+      return await this.handleMessage(message, candidate);
+    } else {
+      await this.userService.createUser({ chatId });
+      const user = await this.userService.getUserByChatId(chatId);
+      if (user && chatType === 'private') this.logger.log(`Handling private message from chatId: ${chatId}`);
+      return await this.handleMessage(message, user);
+    }
   }
 
   async handleMessage(message: Message, user: User) {
     const { text } = message;
-
-    console.log(text);
-
     this.logger.log(`Update message: ${JSON.stringify(message)}`);
     await this.botHandlersService.handleTextMessage(text, user);
   }

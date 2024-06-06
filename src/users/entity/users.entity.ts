@@ -14,7 +14,7 @@ export class User {
   })
   chatId: number;
 
-  @Column({ type: 'varchar', length: 20 })
+  @Column({ type: 'varchar', length: 20, nullable: true })
   city: string;
 
   @Column({ nullable: true })

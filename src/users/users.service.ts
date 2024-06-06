@@ -11,15 +11,16 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async createUser(createUserDto: CreateUserDto) {
-    const { chatId, city } = createUserDto;
-    this.logger.log(`Trying to create user chatId: ${chatId} and city ${city}`);
+    const { chatId } = createUserDto;
+    this.logger.log(`Trying to create user chatId: ${chatId}`);
 
     const { raw } = await this.usersRepository.createUser(createUserDto);
 
     this.logger.debug(`user successfully created with id: ${raw[0].id}`);
   }
 
-  async updateUserCity(chatId: number, { city }: UpdateUserDto) {
+  async updateUserCity(chatId: number, { city, userState }: UpdateUserDto) {
+    console.log(city, userState);
 
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
@@ -35,12 +36,30 @@ export class UsersService {
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
       time,
+      userState,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
   }
 
-  async updateUserTime(chatId: number, { time }: UpdateUserDto) {
+  async updateUserState(chatId: number, { userState }: UpdateUserDto) {
+    this.logger.log(`Trying to get user by chatId: ${chatId} `);
+
+    const user = await this.usersRepository.getUserByChatId(chatId);
+
+    if (!user) {
+      this.logger.error(`user with chatId: ${chatId} not exist`);
+      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
+    }
+
+    const { affected } = await this.usersRepository.updateUser(chatId, {
+      userState,
+    });
+
+    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
+  }
+
+  async updateUserTime(chatId: number, { time, userState }: UpdateUserDto) {
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
     const user = await this.usersRepository.getUserByChatId(chatId);
@@ -55,6 +74,7 @@ export class UsersService {
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
       time,
+      userState,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);

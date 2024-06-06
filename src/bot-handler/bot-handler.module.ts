@@ -2,8 +2,8 @@ import { Module } from '@nestjs/common';
 
 import { BotHandlersService } from './bot-handler.service';
 import { BotModule } from '../bot/bot.module';
+import { CronManager } from '../cron/cron.manager';
 import { UsersModule } from '../users/users.module';
-import { CronManager } from 'src/cron/cron.manager';
 
 @Module({
   imports: [UsersModule, BotModule],

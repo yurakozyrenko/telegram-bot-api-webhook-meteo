@@ -27,8 +27,8 @@ export class BotProvider implements OnModuleInit {
     ]);
   }
 
-  async sendMessage(chatId: number, message: string, options?: any) {
-    await this.bot.sendMessage(chatId, message, options);
+  async sendMessage(chatId: number, message: string) {
+    await this.bot.sendMessage(chatId, message);
   }
 
   async sendMessageAndKeyboard(chatId: number, text: string, keyboard: TelegramBot.KeyboardButton[][]) {

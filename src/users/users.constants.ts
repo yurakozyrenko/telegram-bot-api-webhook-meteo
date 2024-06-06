@@ -10,7 +10,8 @@ export enum UserActions {
 export enum UserState {
   START = 'start',
   EDIT = 'edit',
-  WAITING_FOR_APPROVE = 'waitingForApprove',
+  WAITING_FOR_APPROVE_CITY = 'waitingForApproveCity',
+  WAITING_FOR_APPROVE_TIME = 'waitingForApproveTime',
 }
 
 export const messages = {
