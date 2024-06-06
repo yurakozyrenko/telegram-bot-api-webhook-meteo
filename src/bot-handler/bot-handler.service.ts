@@ -1,7 +1,7 @@
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
 
 import { BotService } from '../bot/bot.service';
-import { CronManager } from '../cron/cron.manager';
+import { CronService } from '../cron/cron.service';
 import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
@@ -14,7 +14,7 @@ export class BotHandlersService {
   constructor(
     private readonly botService: BotService,
     private readonly usersService: UsersService,
-    private readonly cronManager: CronManager,
+    private readonly cronService: CronService,
   ) {}
 
   async onModuleInit() {
@@ -23,8 +23,6 @@ export class BotHandlersService {
       [UserActions.INFO]: async (text, user) => this.handleInfo(text, user),
       [UserActions.EDIT_TIME]: async (text, user) => this.handleEditTime(text, user),
       [UserActions.EDIT_CITY]: async (text, user) => this.handleEditCity(text, user),
-      [UserActions.SELECT_CITY]: async (text, user) => this.handleSelectCity(text, user),
-      [UserActions.SELECT_TIME]: async (text, user) => this.handleSelectTime(text, user),
     };
   }
 
@@ -32,8 +30,6 @@ export class BotHandlersService {
     this.logger.log('run handleTextMessage');
 
     const { userState } = user;
-
-    console.log(text, user);
 
     if (userState === UserState.WAITING_FOR_APPROVE_CITY) {
       return this.waitingForApproveActionCity(text, user);
@@ -46,7 +42,7 @@ export class BotHandlersService {
     const actionHandler = this.userActions[text as UserActions];
 
     if (!actionHandler) {
-      return;
+      return this.handleDefault(text, user.chatId);
     }
     return actionHandler(text, user);
   }
@@ -54,50 +50,33 @@ export class BotHandlersService {
   async handleStart(text: string, { chatId }: User) {
     this.logger.log('run handleStart');
     await this.botService.sendMessage(chatId, messages.START);
+    await this.handleCityAndTimeConfirmation(chatId);
     await this.usersService.updateUserState(chatId, { userState: UserState.START });
-    console.log('hello');
   }
 
   async waitingForApproveActionCity(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run waitingForApproveActionCity');
     await this.usersService.updateUserCity(chatId, { city: text, userState: UserState.START });
     await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${text}`);
+    await this.handleCityAndTimeConfirmation(chatId);
     this.logger.log('waitingForApproveActionCity successfully ended');
   }
 
   async waitingForApproveActionTime(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run waitingForApproveActionTime');
     await this.usersService.updateUserTime(chatId, { time: text, userState: UserState.START });
+
+    await this.cronService.createCronJob({ chatId, time: text });
     await this.botService.sendMessage(chatId, `${messages.TIME_CONFIRMED} ${text}`);
+    await this.handleCityAndTimeConfirmation(chatId);
     this.logger.log('waitingForApproveActionTime successfully ended');
   }
 
-  async handleSelectCity(text: string, { chatId }: User): Promise<void> {
-    console.log(text);
-    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${text}`);
-    await this.usersService.updateUserState(chatId, { userState: UserState.WAITING_FOR_APPROVE_CITY });
-  }
-
-  async handleSelectTime(text: string, { chatId }: User): Promise<void> {
-    const user = await this.usersService.getUserByChatId(chatId);
-    await this.botService.sendMessage(
-      chatId,
-      `${messages.CITY_CONFIRMED} ${user.city} ${messages.TIME_CONFIRMED} ${text}`,
-    );
-  }
-
   async handleInfo(text: string, { chatId }: User): Promise<void> {
-    const user = await this.usersService.getUserByChatId(chatId);
-    if (!user) {
-      await this.botService.sendMessage(chatId, messages.FILL_CITY_TIME_FIRST);
-      return;
-    }
-    const { city, time } = user;
-    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city} ${messages.TIME_CONFIRMED} ${time}`);
+    await this.handleCityAndTimeConfirmation(chatId);
   }
 
   async handleEditCity(text: string, { chatId }: User): Promise<void> {
-    console.log('edit');
     this.logger.log('run waitingForApproveActionCity');
     await this.botService.sendMessage(chatId, messages.CITY_SELECTION);
     await this.usersService.updateUserState(chatId, { userState: UserState.WAITING_FOR_APPROVE_CITY });
@@ -105,14 +84,27 @@ export class BotHandlersService {
   }
 
   async handleEditTime(text: string, { chatId }: User): Promise<void> {
-    console.log('edit');
     this.logger.log('run waitingForApproveActionTime');
     await this.botService.sendMessage(chatId, messages.TIME_SELECTION);
     await this.usersService.updateUserState(chatId, { userState: UserState.WAITING_FOR_APPROVE_TIME });
     this.logger.log('waitingForApproveActionTime successfully ended');
   }
 
-  async handleDefault(text: string, { chatId }: User): Promise<void> {
+  async handleDefault(text: string, chatId: number): Promise<void> {
     await this.botService.sendMessage(chatId, messages.DEFAULT);
+  }
+
+  async handleCityAndTimeConfirmation(chatId: number): Promise<void> {
+    const { city, time } = await this.usersService.getUserByChatId(chatId);
+    if (!city) {
+      await this.botService.sendMessage(chatId, messages.FILL_CITY_FIRST);
+      return;
+    }
+    if (!time) {
+      await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city}`);
+      await this.botService.sendMessage(chatId, messages.FILL_TIME_FIRST);
+      return;
+    }
+    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city}, ${messages.TIME_CONFIRMED} ${time}`);
   }
 }

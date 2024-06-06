@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { BotModule } from './bot/bot.module';
 import config from './config/configuration';
+import { CronModule } from './cron/cron.module';
 import { HealthModule } from './health/health.module';
 import { UpdatesModule } from './updates/updates.module';
 import { UsersModule } from './users/users.module';
@@ -24,6 +25,7 @@ import { UsersModule } from './users/users.module';
     UpdatesModule,
     UsersModule,
     HealthModule,
+    CronModule,
   ],
 })
 export class AppModule {}

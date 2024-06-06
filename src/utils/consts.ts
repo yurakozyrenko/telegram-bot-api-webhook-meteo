@@ -1,4 +1,4 @@
-// export const cronTimezone = 'Europe/Moscow';
+export const cronTimezone = 'Europe/Moscow';
 
 export const WeatherType = {
   THUNDERSTORM: { min: 200, max: 232, emoji: '⚡' },
