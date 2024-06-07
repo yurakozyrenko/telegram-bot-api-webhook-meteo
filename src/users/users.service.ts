@@ -16,7 +16,7 @@ export class UsersService {
     const existingUser = await this.usersRepository.findOneByChatId(chatId);
 
     if (!existingUser) {
-      this.logger.error(`user with chatId: ${chatId} not found`);
+      this.logger.debug(`user with chatId: ${chatId} not found`);
     }
 
     return existingUser;
@@ -36,9 +36,7 @@ export class UsersService {
 
     const { raw } = await this.usersRepository.createUser(createUserDto);
 
-    const id = raw[0].id;
-
-    const newUser = await this.usersRepository.findOneById(id);
+    const newUser = await this.usersRepository.findOneById(raw[0].id);
 
     this.logger.debug(`user successfully created with chatId: ${chatId}`);
 
