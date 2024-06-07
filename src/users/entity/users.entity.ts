@@ -11,6 +11,7 @@ export class User {
   @Column({
     type: 'bigint',
     transformer: bigintTransformer,
+    unique: true,
   })
   chatId: number;
 
@@ -20,7 +21,7 @@ export class User {
   @Column({ nullable: true })
   time: string; // Время для рассылки, может быть null если не выбрано
 
-  @Column({ type: 'enum', enum: UserState, default: null })
+  @Column({ type: 'enum', enum: UserState, default: 'start' })
   userState: UserState;
 
   @CreateDateColumn({ type: 'timestamp without time zone' })

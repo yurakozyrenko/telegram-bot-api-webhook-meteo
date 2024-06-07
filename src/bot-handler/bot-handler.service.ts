@@ -29,6 +29,8 @@ export class BotHandlersService {
   async handleTextMessage(text: string, user: User): Promise<void> {
     this.logger.log('run handleTextMessage');
 
+    console.log(user);
+
     const { userState } = user;
 
     if (userState === UserState.WAITING_FOR_APPROVE_CITY) {
@@ -40,6 +42,7 @@ export class BotHandlersService {
     }
 
     const actionHandler = this.userActions[text as UserActions];
+    console.log(actionHandler);
 
     if (!actionHandler) {
       return this.handleDefault(text, user.chatId);
@@ -47,11 +50,12 @@ export class BotHandlersService {
     return actionHandler(text, user);
   }
 
-  async handleStart(text: string, { chatId }: User) {
+  async handleStart(text: string, user: User) {
     this.logger.log('run handleStart');
-    await this.botService.sendMessage(chatId, messages.START);
-    await this.handleCityAndTimeConfirmation(chatId);
-    await this.usersService.updateUserState(chatId, { userState: UserState.START });
+    console.log(user);
+    await this.botService.sendMessage(user.chatId, messages.START);
+    await this.handleCityAndTimeConfirmation(user.chatId);
+    await this.usersService.updateUserState(user.chatId, { userState: UserState.START });
   }
 
   async waitingForApproveActionCity(text: string, { chatId }: User): Promise<void> {
