@@ -19,12 +19,11 @@ export class UpdatesService {
     const { id: chatId } = from;
     const chatType = message.chat.type;
 
-    let user = await this.userService.getUserByChatId(chatId);
-    if (!user) {
-      await this.userService.createUser({ chatId });
-      user = await this.userService.getUserByChatId(chatId);
-    }
-    if (chatType === 'private') {
+    const existingUser = await this.userService.findOneByChatId(chatId);
+
+    const user = existingUser ? existingUser : await this.userService.createUser({ chatId });
+
+    if (user && chatType === 'private') {
       this.logger.log(`Handling private message from chatId: ${chatId}`);
       await this.handleMessage(message, user);
     }

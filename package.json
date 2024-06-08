@@ -37,8 +37,6 @@
     "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "helmet": "^7.1.0",
-    "nestjs-cls": "^4.3.0",
-    "node-cron": "^3.0.3",
     "node-telegram-bot-api": "^0.63.0",
     "npm-check-updates": "^16.14.20",
     "pg": "^8.11.5",
@@ -50,7 +48,6 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
-    "@types/node-cron": "^3.0.11",
     "@types/node-telegram-bot-api": "^0.64.6",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",

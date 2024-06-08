@@ -47,11 +47,11 @@ export class BotHandlersService {
     return actionHandler(text, user);
   }
 
-  async handleStart(text: string, { chatId }: User) {
+  async handleStart(text: string, user: User) {
     this.logger.log('run handleStart');
-    await this.botService.sendMessage(chatId, messages.START);
-    await this.handleCityAndTimeConfirmation(chatId);
-    await this.usersService.updateUserState(chatId, { userState: UserState.START });
+    await this.botService.sendMessage(user.chatId, messages.START);
+    await this.handleCityAndTimeConfirmation(user.chatId);
+    await this.usersService.updateUserState(user.chatId, { userState: UserState.START });
   }
 
   async waitingForApproveActionCity(text: string, { chatId }: User): Promise<void> {

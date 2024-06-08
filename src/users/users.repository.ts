@@ -17,6 +17,14 @@ export class UsersRepository {
     return await this.usersRepository.createQueryBuilder('users').insert().into(User).values(createUserDto).execute();
   }
 
+  async findOneByChatId(chatId: number): Promise<User | null> {
+    return await this.usersRepository.createQueryBuilder('users').where('users.chatId = :chatId', { chatId }).getOne();
+  }
+
+  async findOneById(id: number): Promise<User | null> {
+    return await this.usersRepository.createQueryBuilder('users').where('users.id = :id', { id }).getOne();
+  }
+
   async updateUser(chatId: number, updateUserDto: UpdateUserDto): Promise<UpdateResult> {
     return await this.usersRepository
       .createQueryBuilder('users')
