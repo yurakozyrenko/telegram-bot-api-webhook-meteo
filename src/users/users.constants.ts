@@ -1,6 +1,5 @@
 export enum UserActions {
   START = '/start',
-  INFO = '/info',
   WEATHER = 'Получить погоду',
 }
 
@@ -40,7 +39,7 @@ export const messages = {
   TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
   TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на: ',
   EDIT_CITY: 'Выберите новый город для ежедневной рассылки: ',
-  ALREADY_SAVED: 'Ваши данные уже сохранены. Хотите изменить город или время? Используйте команду /edit.',
+  ALREADY_SAVED: 'Ваши данные приняты.',
   FILL_CITY_FIRST: 'Заполните поле выбора /edit_city города',
   FILL_TIME_FIRST: 'Заполните поле выбора /edit_time времени',
   DEFAULT: 'Привет, я умею отправлять погоду, /edit_city введи город и /edit_time время',

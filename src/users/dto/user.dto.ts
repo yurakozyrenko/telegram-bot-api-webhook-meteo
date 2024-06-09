@@ -12,9 +12,6 @@ export class UserDto {
   @Length(1, 20)
   city: User['city'];
 
-  @IsString()
-  time: User['time'];
-
   @IsEnum(UserState)
   userState: User['userState'];
 }

@@ -18,9 +18,6 @@ export class User {
   @Column({ type: 'varchar', length: 20, nullable: true })
   city: string;
 
-  @Column({ nullable: true })
-  time: string; // Время для рассылки, может быть null если не выбрано
-
   @Column({ type: 'enum', enum: UserState, default: 'start' })
   userState: UserState;
 }

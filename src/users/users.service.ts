@@ -46,49 +46,18 @@ export class UsersService {
   async updateUserCity(chatId: number, { city }: UpdateUserDto) {
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
-    const user = await this.usersRepository.getUserByChatId(chatId);
+    const user = await this.usersRepository.findOneByChatId(chatId);
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
       throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 
-    const { time } = user;
-
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
-      time,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
-  }
-
-  async updateUserTime(chatId: number, { time }: UpdateUserDto) {
-    this.logger.log(`Trying to get user by chatId: ${chatId} `);
-
-    const user = await this.usersRepository.getUserByChatId(chatId);
-
-    if (!user) {
-      this.logger.error(`user with chatId: ${chatId} not exist`);
-      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
-    }
-
-    const { city } = user;
-
-    const { affected } = await this.usersRepository.updateUser(chatId, {
-      city,
-      time,
-    });
-
-    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
-  }
-
-  async getUserByChatId(chatId: number): Promise<User> {
-    this.logger.log(`Trying to get user by chatId: ${chatId} `);
-
-    const foundUser = this.usersRepository.getUserByChatId(chatId);
-
-    return foundUser;
   }
 
   async getAllUsers(): Promise<User[]> {

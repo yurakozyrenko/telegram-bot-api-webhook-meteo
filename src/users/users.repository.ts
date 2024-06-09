@@ -34,10 +34,6 @@ export class UsersRepository {
       .execute();
   }
 
-  async getUserByChatId(chatId: number): Promise<User> {
-    return await this.usersRepository.createQueryBuilder('users').where('users.chat_id = :chatId', { chatId }).getOne();
-  }
-
   async getAllUsers(): Promise<[User[], number]> {
     return await this.usersRepository.createQueryBuilder('users').getManyAndCount();
   }

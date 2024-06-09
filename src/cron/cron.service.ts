@@ -26,7 +26,7 @@ export class CronService implements OnModuleInit {
   async addCronJob(chatId: CronEntity['chatId'], time: CronEntity['time']) {
     this.logger.log(`trying to add cron job with time: ${time} andchatId: ${chatId}`);
     time = timeToCronValue(time);
-    const { city } = await this.userService.getUserByChatId(chatId);
+    const { city } = await this.userService.findOneByChatId(chatId);
     const meteoData = await getMeteoData(city);
     const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
     this.schedulerRegistry.addCronJob(chatId.toString(), job);

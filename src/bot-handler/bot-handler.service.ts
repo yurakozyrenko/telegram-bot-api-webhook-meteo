@@ -21,7 +21,6 @@ export class BotHandlersService {
   async onModuleInit() {
     this.userActions = {
       [UserActions.START]: async (text, user) => this.handleStart(text, user), //старт
-      [UserActions.INFO]: async (text, user) => this.handleInfo(user), //инфо
       [UserActions.WEATHER]: async (text, user) => this.handleEditCity(text, user), //получить погоду
     };
   }
@@ -63,9 +62,7 @@ export class BotHandlersService {
     const message = `${messages.CITY_SELECTION}`;
 
     const cities = Object.values(Cities) as string[];
-
     const cityButtons = cities.map((city) => [{ text: city }]);
-
     const keyboard = [...cityButtons];
 
     await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
@@ -98,7 +95,6 @@ export class BotHandlersService {
     const { chatId } = user;
     this.logger.log('run ConfirmTime');
 
-    await this.usersService.updateUserTime(chatId, { time: text });
     await this.cronService.createCronJob({ chatId, time: text });
     await this.handleConfirmCityTime(chatId);
 
@@ -106,13 +102,7 @@ export class BotHandlersService {
   }
 
   async handleConfirmCityTime(chatId: number): Promise<void> {
-    const { city, time } = await this.usersService.getUserByChatId(chatId);
-    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city}, ${messages.TIME_CONFIRMED} ${time}`);
-  }
-
-  async handleInfo(user: User) {
-    const { city, time, chatId } = user;
-    await this.botService.sendMessage(chatId, `${messages.CITY_CONFIRMED} ${city}, ${messages.TIME_CONFIRMED} ${time}`);
+    await this.botService.sendMessage(chatId, `${messages.ALREADY_SAVED}`);
   }
 
   async handleDefault(text: string, chatId: number): Promise<void> {
