@@ -5,7 +5,7 @@ export class CronEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ type: 'varchar', length: 40, unique: true })
+  @Column({ type: 'varchar', length: 40 })
   time: string;
 
   @Column({ type: 'varchar', length: 40, unique: true })

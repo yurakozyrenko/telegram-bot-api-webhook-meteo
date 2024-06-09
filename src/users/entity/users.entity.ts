@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 import { bigintTransformer } from '../../utils/bigintTransformer';
 import { UserState } from '../users.constants';
@@ -23,10 +23,4 @@ export class User {
 
   @Column({ type: 'enum', enum: UserState, default: 'start' })
   userState: UserState;
-
-  @CreateDateColumn({ type: 'timestamp without time zone' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamp without time zone' })
-  updatedAt: Date;
 }

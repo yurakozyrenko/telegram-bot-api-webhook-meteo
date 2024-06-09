@@ -43,7 +43,7 @@ export class UsersService {
     return newUser;
   }
 
-  async updateUserCity(chatId: number, { city, userState }: UpdateUserDto) {
+  async updateUserCity(chatId: number, { city }: UpdateUserDto) {
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
     const user = await this.usersRepository.getUserByChatId(chatId);
@@ -58,30 +58,12 @@ export class UsersService {
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
       time,
-      userState,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
   }
 
-  async updateUserState(chatId: number, { userState }: UpdateUserDto) {
-    this.logger.log(`Trying to get user by chatId: ${chatId} `);
-
-    const user = await this.usersRepository.getUserByChatId(chatId);
-
-    if (!user) {
-      this.logger.error(`user with chatId: ${chatId} not exist`);
-      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
-    }
-
-    const { affected } = await this.usersRepository.updateUser(chatId, {
-      userState,
-    });
-
-    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
-  }
-
-  async updateUserTime(chatId: number, { time, userState }: UpdateUserDto) {
+  async updateUserTime(chatId: number, { time }: UpdateUserDto) {
     this.logger.log(`Trying to get user by chatId: ${chatId} `);
 
     const user = await this.usersRepository.getUserByChatId(chatId);
@@ -96,7 +78,6 @@ export class UsersService {
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
       time,
-      userState,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);

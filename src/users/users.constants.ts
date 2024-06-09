@@ -1,20 +1,40 @@
 export enum UserActions {
   START = '/start',
   INFO = '/info',
-  EDIT_CITY = '/edit_city',
-  EDIT_TIME = '/edit_time',
+  WEATHER = 'Получить погоду',
 }
 
 export enum UserState {
   START = 'start',
   EDIT = 'edit',
-  WAITING_FOR_APPROVE_CITY = 'waitingForApproveCity',
-  WAITING_FOR_APPROVE_TIME = 'waitingForApproveTime',
+}
+
+export enum Cities {
+  Minsk = 'Минск',
+  Grodno = 'Гродно',
+  Brest = 'Брест',
+  Mogilev = 'Могилёв',
+  Vitebsk = 'Витебск',
+  Gomel = 'Гомель',
+}
+
+export enum Times {
+  T08_00 = '08:00',
+  T10_00 = '10:00',
+  T12_00 = '12:00',
+  T14_00 = '14:00',
+  T16_00 = '16:00',
+  T18_00 = '18:00',
+  T20_00 = '20:00',
+  T22_00 = '22:00',
 }
 
 export const messages = {
-  START: 'Welcome! я умею отправлять погоду',
+  START: 'Привет! Добро пожаловать в нашего бота!',
   INFO: 'INFO',
+  MENU_SELECTION: 'Пожалуйста, выберите из меню: ',
+  MENU_WEATHER: 'Получить погоду',
+
   CITY_SELECTION: 'Пожалуйста, введите название вашего города: ',
   CITY_CONFIRMED: 'Ваш город настроен на: ',
   TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
