@@ -47,10 +47,10 @@ export class BotHandlersService {
     return actionHandler(text, user);
   }
 
-  async handleStart(text: string, user: User) {
+  async handleStart(text: string, { chatId }: User) {
     this.logger.log('run handleStart');
-    const { chatId } = user;
-    await this.botService.sendMessage(user.chatId, messages.START);
+
+    await this.botService.sendMessage(chatId, messages.START);
     await delay();
     const message = `${messages.MENU_SELECTION}`;
     const keyboard = [[{ text: `${messages.MENU_WEATHER}` }]];
@@ -59,6 +59,7 @@ export class BotHandlersService {
 
   async handleEditCity(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run EditCity');
+
     const message = `${messages.CITY_SELECTION}`;
 
     const cities = Object.values(Cities) as string[];
@@ -89,10 +90,7 @@ export class BotHandlersService {
     await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
   }
 
-  async handleConfirmTime(text: string, user: User): Promise<void> {
-    this.logger.log('run ConfirmTime');
-
-    const { chatId } = user;
+  async handleConfirmTime(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run ConfirmTime');
 
     await this.cronService.createCronJob({ chatId, time: text });
