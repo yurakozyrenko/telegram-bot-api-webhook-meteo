@@ -30,17 +30,11 @@ export enum Times {
 
 export const messages = {
   START: 'Привет! Добро пожаловать в нашего бота!',
-  INFO: 'INFO',
   MENU_SELECTION: 'Пожалуйста, выберите из меню: ',
   MENU_WEATHER: 'Получить погоду',
 
   CITY_SELECTION: 'Пожалуйста, введите название вашего города: ',
-  CITY_CONFIRMED: 'Ваш город настроен на: ',
   TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',
-  TIME_CONFIRMED: 'Время для ежедневной рассылки установлено на: ',
-  EDIT_CITY: 'Выберите новый город для ежедневной рассылки: ',
   ALREADY_SAVED: 'Ваши данные приняты.',
-  FILL_CITY_FIRST: 'Заполните поле выбора /edit_city города',
-  FILL_TIME_FIRST: 'Заполните поле выбора /edit_time времени',
-  DEFAULT: 'Привет, я умею отправлять погоду, /edit_city введи город и /edit_time время',
+  DEFAULT: 'Привет, я умею отправлять погоду.',
 };
