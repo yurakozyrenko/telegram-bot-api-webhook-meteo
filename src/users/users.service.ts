@@ -17,6 +17,7 @@ export class UsersService {
 
     if (!existingUser) {
       this.logger.debug(`user with chatId: ${chatId} not found`);
+      throw new HttpException(`user with chatId: ${chatId} not found`, HttpStatus.NOT_FOUND);
     }
 
     return existingUser;
@@ -55,6 +56,23 @@ export class UsersService {
 
     const { affected } = await this.usersRepository.updateUser(chatId, {
       city,
+    });
+
+    this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);
+  }
+
+  async updateUser(chatId: number, { userState }: UpdateUserDto) {
+    this.logger.log(`Trying to get user by chatId: ${chatId} `);
+
+    const user = await this.usersRepository.findOneByChatId(chatId);
+
+    if (!user) {
+      this.logger.error(`user with chatId: ${chatId} not exist`);
+      throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
+    }
+
+    const { affected } = await this.usersRepository.updateUser(chatId, {
+      userState,
     });
 
     this.logger.debug(`${affected} user successfully updated by chatId: ${chatId}`);

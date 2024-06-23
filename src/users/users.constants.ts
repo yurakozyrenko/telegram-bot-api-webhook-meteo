@@ -1,11 +1,14 @@
 export enum UserActions {
   START = '/start',
   WEATHER = 'Получить погоду',
+  CANSEL = 'Отписаться от уведомлений',
 }
 
 export enum UserState {
   START = 'start',
-  EDIT = 'edit',
+  CITY = 'city',
+  TIME = 'time',
+  CONFIRM = 'confirm',
 }
 
 export enum Cities {
@@ -32,6 +35,7 @@ export const messages = {
   START: 'Привет! Добро пожаловать в нашего бота!',
   MENU_SELECTION: 'Пожалуйста, выберите из меню: ',
   MENU_WEATHER: 'Получить погоду',
+  MENU_CANSEL: 'Отписаться от уведомлений',
 
   CITY_SELECTION: 'Пожалуйста, введите название вашего города: ',
   TIME_SELECTION: 'Выберите время для ежедневной рассылки: ',

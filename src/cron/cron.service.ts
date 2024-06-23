@@ -58,20 +58,20 @@ export class CronService implements OnModuleInit {
     return cronJobs;
   }
 
-  async deleteCronJob(id: CronEntity['id']) {
-    this.logger.log(`trying to delete cron job with id: ${id}`);
+  async deleteCronJob(chatId: CronEntity['chatId']) {
+    this.logger.log(`trying to delete cron job with chatId: ${chatId}`);
 
-    const cronJobById = await this.cronRepository.getCronJobByChatId(id);
+    const cronJobById = await this.cronRepository.getCronJobByChatId(chatId);
 
     if (!cronJobById) {
-      this.logger.error(`CronJob with id: ${id} not exist`);
-      throw new HttpException(`CronJob with id: ${id} not exist`, HttpStatus.BAD_REQUEST);
+      this.logger.error(`CronJob with chatId: ${chatId} not exist`);
+      throw new HttpException(`CronJob with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 
-    const { affected } = await this.cronRepository.deleteCronJob(id);
+    const { affected } = await this.cronRepository.deleteCronJob(chatId);
 
     this.stopCronJob(cronJobById.chatId.toString());
-    this.logger.log(`${affected} cron jobs successfully deleted with id: ${id}`);
+    this.logger.log(`${affected} cron jobs successfully deleted with chatId: ${chatId}`);
   }
 
   async createCronJob(createCronJobDto: CreateCronJobDto) {
@@ -84,11 +84,13 @@ export class CronService implements OnModuleInit {
     if (!cronJobByChatId) {
       const { raw } = await this.cronRepository.createCronJob(createCronJobDto);
       this.addCronJob(chatId, time);
+      
       this.logger.log(`cron jobs successfully created with id: ${raw[0].id}`);
     } else {
       const { affected } = await this.cronRepository.updateCronJob(chatId, createCronJobDto);
       this.stopCronJob(cronJobByChatId.chatId.toString());
       this.addCronJob(chatId, time);
+
       this.logger.log(`${affected} cron jobs successfully updated`);
     }
   }

@@ -39,7 +39,11 @@ export class CronRepository {
       .execute();
   }
 
-  async deleteCronJob(id: number): Promise<DeleteResult> {
-    return await this.cronEntityRepository.createQueryBuilder('cron').delete().where('id = :id', { id }).execute();
+  async deleteCronJob(chatId: number): Promise<DeleteResult> {
+    return await this.cronEntityRepository
+      .createQueryBuilder('cron')
+      .delete()
+      .where('chat_id = :chatId', { chatId })
+      .execute();
   }
 }
