@@ -17,7 +17,6 @@ export class UsersService {
 
     if (!existingUser) {
       this.logger.debug(`user with chatId: ${chatId} not found`);
-      throw new HttpException(`user with chatId: ${chatId} not found`, HttpStatus.NOT_FOUND);
     }
 
     return existingUser;
