@@ -10,16 +10,22 @@ import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
 import getMeteoData from 'src/utils/getMeteo';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class BotHandlersService {
   private readonly logger: LoggerService = new Logger(BotHandlersService.name);
   private userActions: TUsersActions;
+  private readonly apiKey: string;
+
   constructor(
     private readonly botService: BotService,
     private readonly usersService: UsersService,
     private readonly cronService: CronService,
-  ) {}
+    private configService: ConfigService,
+  ) {
+    this.apiKey = this.configService.get('API_KEY');
+  }
 
   async onModuleInit() {
     this.userActions = {
@@ -116,7 +122,10 @@ export class BotHandlersService {
 
     const { city, chatId } = user;
 
-    const meteoData = await getMeteoData(city);
+    const cityName = encodeURIComponent(city);
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${this.apiKey}`;
+
+    const meteoData = await getMeteoData(city, url);
 
     await this.botService.sendMessage(chatId, meteoData);
 

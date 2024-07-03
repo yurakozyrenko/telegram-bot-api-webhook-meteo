@@ -2,12 +2,8 @@ import axios from 'axios';
 
 import getEmojiIcon from './getEmojiIcon';
 
-async function getMeteoData(message: string): Promise<string> {
+async function getMeteoData(message: string, url: string): Promise<string> {
   try {
-    const cityName = encodeURIComponent(message);
-
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${process.env.API_KEY}`;
-
     const { data } = await axios.get(url);
 
     const weatherType = data.weather[0].id;
