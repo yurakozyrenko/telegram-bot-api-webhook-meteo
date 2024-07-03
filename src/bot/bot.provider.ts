@@ -22,8 +22,9 @@ export class BotProvider implements OnModuleInit {
     this.bot = new TelegramBot(this.botToken, { polling: false });
     this.bot.setMyCommands([
       { command: 'start', description: 'Запустить бота' },
-      { command: 'weather', description: 'получить погоду' },
-      { command: 'cansel', description: 'отписпться от уведомлений' },
+      { command: 'weather', description: 'получить погоду сейчас' },
+      { command: 'settings', description: 'настройки' },
+      { command: 'cansel', description: 'отписаться от уведомлений' },
     ]);
   }
 

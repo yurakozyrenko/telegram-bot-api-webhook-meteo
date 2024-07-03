@@ -9,6 +9,7 @@ import { TUsersActions } from '../users/users.types';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
+import getMeteoData from 'src/utils/getMeteo';
 
 @Injectable()
 export class BotHandlersService {
@@ -24,6 +25,9 @@ export class BotHandlersService {
     this.userActions = {
       [UserActions.START]: async (text, user) => this.handleStart(text, user), //старт
       [UserActions.WEATHER]: async (text, user) => this.handleEditCity(text, user), //получить погоду
+      [UserActions.SETTINGS]: async (text, user) => this.handleEditCity(text, user), //настройки
+      [UserActions.WEATHER_NOW]: async (text, user) => this.handleWeatherNow(text, user), //получить погоду сейчас
+      [UserActions.SETTINGS_NOW]: async (text, user) => this.handleEditCity(text, user), // settings
       [UserActions.CANSEL]: async (text, user) => this.handleCansel(text, user), //отписаться
     };
   }
@@ -56,7 +60,11 @@ export class BotHandlersService {
     await this.usersService.updateUser(chatId, { userState: UserState.START });
     await delay();
     const message = `${messages.MENU_SELECTION}`;
-    const keyboard = [[{ text: `${messages.MENU_WEATHER}` }], [{ text: `${messages.MENU_CANSEL}` }]];
+    const keyboard = [
+      [{ text: `${messages.MENU_WEATHER}` }],
+      [{ text: `${messages.MENU_SETTINGS}` }],
+      [{ text: `${messages.MENU_CANSEL}` }],
+    ];
     await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
   }
 
@@ -86,7 +94,7 @@ export class BotHandlersService {
     const message = `${messages.TIME_SELECTION}`;
 
     const keyboard = generateTime();
-    
+
     await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
     await this.usersService.updateUser(chatId, { userState: UserState.TIME });
   }
@@ -103,10 +111,36 @@ export class BotHandlersService {
     this.logger.log('ConfirmTime successfully ended');
   }
 
+  async handleWeatherNow(text: string, user: User): Promise<void> {
+    this.logger.log('run get WeatherNow');
+
+    const { city, chatId } = user;
+
+    const meteoData = await getMeteoData(city);
+
+    await this.botService.sendMessage(chatId, meteoData);
+
+    this.logger.log('WeatherNow successfully ended');
+  }
+
+  async handleSettings(text: string, user: User): Promise<void> {
+    this.logger.log('run Settings ');
+
+    const { city, chatId } = user;
+
+    await this.botService.sendMessage(chatId, `${city}`);
+
+    this.logger.log('Settings successfully ended');
+  }
+
   async handleCansel(text: string, { chatId }: User): Promise<void> {
     this.logger.log('run Cansel ');
 
-    await this.cronService.deleteCronJob(chatId);
+    try {
+      await this.cronService.deleteCronJob(chatId);
+    } catch (e) {}
+
+    await this.botService.sendMessage(chatId, `${messages.MENU_CANSEL}`);
 
     this.logger.log('Cansel successfully ended');
   }
