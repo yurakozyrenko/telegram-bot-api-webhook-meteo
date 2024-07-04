@@ -9,3 +9,8 @@ export const WeatherType = {
   CLOUDS: { min: 801, max: 804, emoji: '⛅' },
   CLEAR: { min: 800, max: 800, emoji: '☀️' },
 };
+
+export const APIConstants = {
+  BASE_URL: 'https://api.openweathermap.org/data/2.5/weather',
+  UNITS: 'metric',
+};

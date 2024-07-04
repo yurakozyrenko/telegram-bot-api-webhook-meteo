@@ -8,7 +8,7 @@ import { UpdateCronJobDto } from './dto/updateCronJob.dto';
 import { CronEntity } from './entity/cron.entity';
 import { BotService } from '../bot/bot.service';
 import { UsersService } from '../users/users.service';
-import { cronTimezone } from '../utils/consts';
+import { APIConstants, cronTimezone } from '../utils/consts';
 import getMeteoData from '../utils/getMeteo';
 import timeToCronValue from '../utils/timeToCronValue';
 import { ConfigService } from '@nestjs/config';
@@ -34,7 +34,7 @@ export class CronService implements OnModuleInit {
     const { city } = await this.userService.findOneByChatId(chatId);
 
     const cityName = encodeURIComponent(city);
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${this.apiKey}`;
+    const url = `${APIConstants.BASE_URL}?q=${cityName}&units=${APIConstants.UNITS}&appid=${this.apiKey}`;
 
     const meteoData = await getMeteoData(city, url);
     const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);

@@ -11,6 +11,7 @@ import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
 import getMeteoData from 'src/utils/getMeteo';
 import { ConfigService } from '@nestjs/config';
+import { APIConstants } from 'src/utils/consts';
 
 @Injectable()
 export class BotHandlersService {
@@ -123,7 +124,7 @@ export class BotHandlersService {
     const { city, chatId } = user;
 
     const cityName = encodeURIComponent(city);
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${this.apiKey}`;
+    const url = `${APIConstants.BASE_URL}?q=${cityName}&units=${APIConstants.UNITS}&appid=${this.apiKey}`;
 
     const meteoData = await getMeteoData(city, url);
 
