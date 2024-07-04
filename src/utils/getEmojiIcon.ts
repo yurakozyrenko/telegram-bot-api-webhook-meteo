@@ -1,9 +1,9 @@
-import { WeatherType } from './consts';
+import { WEATHERTYPE } from './consts';
 
 function getEmojiIcon(weatherType: number): string {
-  for (const key of Object.keys(WeatherType) as Array<keyof typeof WeatherType>) {
-    if (weatherType >= WeatherType[key].min && weatherType <= WeatherType[key].max) {
-      return WeatherType[key].emoji;
+  for (const key of Object.keys(WEATHERTYPE) as Array<keyof typeof WEATHERTYPE>) {
+    if (weatherType >= WEATHERTYPE[key].min && weatherType <= WEATHERTYPE[key].max) {
+      return WEATHERTYPE[key].emoji;
     }
   }
 }

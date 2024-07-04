@@ -1,6 +1,6 @@
 export const cronTimezone = 'Europe/Moscow';
 
-export const WeatherType = {
+export const WEATHERTYPE = {
   THUNDERSTORM: { min: 200, max: 232, emoji: '⚡' },
   DRIZZLE: { min: 300, max: 321, emoji: '🌧️' },
   RAIN: { min: 500, max: 531, emoji: '☔' },
@@ -10,7 +10,12 @@ export const WeatherType = {
   CLEAR: { min: 800, max: 800, emoji: '☀️' },
 };
 
-export const APIConstants = {
+export const APIWEATHER = {
   BASE_URL: 'https://api.openweathermap.org/data/2.5/weather',
   UNITS: 'metric',
+};
+
+export const WEATHER = {
+  TEMPERATURE_UNIT: 'град C',
+  WEATHER_DATA_ERROR: `Ошибка при получении данных о погоде в городе`,
 };

@@ -1,20 +1,22 @@
 import axios from 'axios';
 
+import { WEATHER } from './consts';
 import getEmojiIcon from './getEmojiIcon';
+import { IGetMeteoData } from './interfaces';
 
-async function getMeteoData(message: string, url: string): Promise<string> {
+async function getMeteoData({ city, url }: IGetMeteoData): Promise<string> {
   try {
     const { data } = await axios.get(url);
 
     const weatherType = data.weather[0].id;
 
-    const temtemperature = data.main.temp;
+    const temperature = data.main.temp;
 
     const emojiIcon = getEmojiIcon(weatherType);
 
-    return `Погода ${message} ${emojiIcon} ${temtemperature} град C`;
+    return `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
   } catch (error) {
-    return `Ошибка при получении данных о погоде в городе ${message}`;
+    return `${WEATHER.WEATHER_DATA_ERROR} ${city}`;
   }
 }
 

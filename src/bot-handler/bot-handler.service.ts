@@ -7,7 +7,7 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
-import { APIConstants } from '../utils/consts';
+import { APIWEATHER } from '../utils/consts';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
@@ -32,7 +32,6 @@ export class BotHandlersService {
     this.userActions = {
       [UserActions.START]: async (text, user) => this.handleStart(text, user), //старт
       [UserActions.WEATHER]: async (text, user) => this.handleEditCity(text, user), //получить погоду
-      [UserActions.SETTINGS]: async (text, user) => this.handleEditCity(text, user), //настройки
       [UserActions.WEATHER_NOW]: async (text, user) => this.handleWeatherNow(text, user), //получить погоду сейчас
       [UserActions.SETTINGS_NOW]: async (text, user) => this.handleEditCity(text, user), // settings
       [UserActions.CANSEL]: async (text, user) => this.handleCansel(text, user), //отписаться
@@ -67,11 +66,7 @@ export class BotHandlersService {
     await this.usersService.updateUser(chatId, { userState: UserState.START });
     await delay();
     const message = `${messages.MENU_SELECTION}`;
-    const keyboard = [
-      [{ text: `${messages.MENU_WEATHER}` }],
-      [{ text: `${messages.MENU_SETTINGS}` }],
-      [{ text: `${messages.MENU_CANSEL}` }],
-    ];
+    const keyboard = [[{ text: `${messages.MENU_WEATHER}` }], [{ text: `${messages.MENU_CANSEL}` }]];
     await this.botService.sendMessageAndKeyboard(chatId, message, keyboard);
   }
 
@@ -124,9 +119,9 @@ export class BotHandlersService {
     const { city, chatId } = user;
 
     const cityName = encodeURIComponent(city);
-    const url = `${APIConstants.BASE_URL}?q=${cityName}&units=${APIConstants.UNITS}&appid=${this.apiKey}`;
+    const url = `${APIWEATHER.BASE_URL}?q=${cityName}&units=${APIWEATHER.UNITS}&appid=${this.apiKey}`;
 
-    const meteoData = await getMeteoData(city, url);
+    const meteoData = await getMeteoData({ city, url });
 
     await this.botService.sendMessage(chatId, meteoData);
 
