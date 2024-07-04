@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 
@@ -11,7 +12,6 @@ import { UsersService } from '../users/users.service';
 import { APIConstants, cronTimezone } from '../utils/consts';
 import getMeteoData from '../utils/getMeteo';
 import timeToCronValue from '../utils/timeToCronValue';
-import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class CronService implements OnModuleInit {

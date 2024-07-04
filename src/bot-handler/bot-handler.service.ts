@@ -1,4 +1,5 @@
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 
 import { BotService } from '../bot/bot.service';
 import { CronService } from '../cron/cron.service';
@@ -6,12 +7,11 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
+import { APIConstants } from '../utils/consts';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
-import getMeteoData from 'src/utils/getMeteo';
-import { ConfigService } from '@nestjs/config';
-import { APIConstants } from 'src/utils/consts';
+import getMeteoData from '../utils/getMeteo';
 
 @Injectable()
 export class BotHandlersService {
