@@ -7,7 +7,7 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
-import { APIWEATHER } from '../utils/consts';
+import { API_WEATHER } from '../utils/consts';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
@@ -119,7 +119,7 @@ export class BotHandlersService {
     const { city, chatId } = user;
 
     const cityName = encodeURIComponent(city);
-    const url = `${APIWEATHER.BASE_URL}?q=${cityName}&units=${APIWEATHER.UNITS}&appid=${this.apiKey}`;
+    const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
     const meteoData = await getMeteoData({ city, url });
 
