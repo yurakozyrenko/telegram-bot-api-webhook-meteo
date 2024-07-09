@@ -7,11 +7,14 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
-import { API_WEATHER } from '../utils/consts';
+import { API_WEATHER, WEATHER } from '../utils/consts';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
 import getMeteoData from '../utils/getMeteo';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import getEmojiIcon from 'src/utils/getEmojiIcon';
 
 @Injectable()
 export class BotHandlersService {
@@ -23,6 +26,7 @@ export class BotHandlersService {
     private readonly botService: BotService,
     private readonly usersService: UsersService,
     private readonly cronService: CronService,
+    private readonly httpService: HttpService,
     private configService: ConfigService,
   ) {
     this.apiKey = this.configService.get('API_KEY');
@@ -118,14 +122,27 @@ export class BotHandlersService {
 
     const { city, chatId } = user;
 
-    const cityName = encodeURIComponent(city);
-    const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
+    try {
+      const cityName = encodeURIComponent(city);
+      const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
-    const meteoData = await getMeteoData({ city, url });
+      const { data } = await firstValueFrom(this.httpService.get(url));
 
-    await this.botService.sendMessage(chatId, meteoData);
+      const weatherType = data.weather[0].id;
 
-    this.logger.log('WeatherNow successfully ended');
+      const temperature = data.main.temp;
+
+      const emojiIcon = getEmojiIcon(weatherType);
+
+      const meteoData = `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
+
+      await this.botService.sendMessage(chatId, meteoData);
+
+      this.logger.log('WeatherNow successfully ended');
+    } catch (error) {
+      this.logger.error('Error in handleWeatherNow', error);
+      await this.botService.sendMessage(chatId, 'Sorry, there was an error retrieving the weather data.');
+    }
   }
 
   async handleSettings(text: string, user: User): Promise<void> {
