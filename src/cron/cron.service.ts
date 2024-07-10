@@ -39,17 +39,15 @@ export class CronService implements OnModuleInit {
     const cityName = encodeURIComponent(city);
     const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
+    this.logger.log(`run get weather ${city}`);
+
     const { data } = await firstValueFrom(this.httpService.get(url));
 
-    const meteoData = getMeteoData(data);
+    this.logger.debug(`successfully get weather ${city}`);
 
-    const job = new CronJob(
-      time,
-      () => this.botService.sendMessage(chatId, `${city} ${meteoData}`),
-      null,
-      true,
-      cronTimezone,
-    );
+    const meteoData = getMeteoData(data, city);
+
+    const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
     this.schedulerRegistry.addCronJob(chatId.toString(), job);
     this.logger.log(`Cron job scheduled with cronTime: ${time} and chatId: ${chatId}`);
   }

@@ -1,4 +1,4 @@
-export interface WeatherData {
+export interface IWeatherData {
   weather: {
     id: number;
   }[];

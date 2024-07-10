@@ -121,15 +121,19 @@ export class BotHandlersService {
 
     const { city, chatId } = user;
 
+    const cityName = encodeURIComponent(city);
+    const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
+
     try {
-      const cityName = encodeURIComponent(city);
-      const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
+      this.logger.log(`run get weather ${city}`);
 
       const { data } = await firstValueFrom(this.httpService.get(url));
 
-      const meteoData = getMeteoData(data);
+      this.logger.debug(`successfully get weather ${city}`);
 
-      await this.botService.sendMessage(chatId, `${city} ${meteoData}`);
+      const meteoData = getMeteoData(data, city);
+
+      await this.botService.sendMessage(chatId, meteoData);
 
       this.logger.log('WeatherNow successfully ended');
     } catch (error) {
