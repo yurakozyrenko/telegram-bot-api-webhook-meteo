@@ -19,6 +19,7 @@ import timeToCronValue from '../utils/timeToCronValue';
 export class CronService implements OnModuleInit {
   private readonly logger = new Logger(CronService.name);
   private readonly apiKey: string;
+  private readonly chatId: number;
 
   constructor(
     private readonly botService: BotService,
@@ -29,27 +30,40 @@ export class CronService implements OnModuleInit {
     private configService: ConfigService,
   ) {
     this.apiKey = this.configService.get('API_KEY');
+    this.chatId = this.configService.get('CHAT_ID_ALERT');
   }
 
   async addCronJob(chatId: CronEntity['chatId'], time: CronEntity['time']) {
     this.logger.log(`trying to add cron job with time: ${time} andchatId: ${chatId}`);
     time = timeToCronValue(time);
+
     const { city } = await this.userService.findOneByChatId(chatId);
 
     const cityName = encodeURIComponent(city);
     const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
     this.logger.log(`run get weather ${city}`);
+    try {
+      const { data } = await firstValueFrom(this.httpService.get(url));
 
-    const { data } = await firstValueFrom(this.httpService.get(url));
+      this.logger.debug(`successfully get weather ${city}`);
 
-    this.logger.debug(`successfully get weather ${city}`);
+      const meteoData = getMeteoData(data, city);
 
-    const meteoData = getMeteoData(data, city);
+      const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
+      this.schedulerRegistry.addCronJob(chatId.toString(), job);
 
-    const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
-    this.schedulerRegistry.addCronJob(chatId.toString(), job);
-    this.logger.log(`Cron job scheduled with cronTime: ${time} and chatId: ${chatId}`);
+      this.logger.log(`Cron job scheduled with cronTime: ${time} and chatId: ${chatId}`);
+    } catch (error) {
+      this.logger.error(`Error while adding cron job for chatId ${chatId}`);
+
+      await this.botService.sendMessage(
+        this.chatId,
+        `chatId ${chatId} and city ${city} was an error retrieving the weather data.`,
+      );
+
+      return;
+    }
   }
 
   stopCronJob(chatId: string) {

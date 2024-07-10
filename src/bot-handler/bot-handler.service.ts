@@ -20,6 +20,7 @@ export class BotHandlersService {
   private readonly logger: LoggerService = new Logger(BotHandlersService.name);
   private userActions: TUsersActions;
   private readonly apiKey: string;
+  private readonly chatId: number;
 
   constructor(
     private readonly botService: BotService,
@@ -29,6 +30,7 @@ export class BotHandlersService {
     private configService: ConfigService,
   ) {
     this.apiKey = this.configService.get('API_KEY');
+    this.chatId = this.configService.get('CHAT_ID_ALERT');
   }
 
   async onModuleInit() {
@@ -125,11 +127,11 @@ export class BotHandlersService {
     const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
     try {
-      this.logger.log(`run get weather ${city}`);
+      this.logger.log(`run get weather city ${city}`);
 
       const { data } = await firstValueFrom(this.httpService.get(url));
 
-      this.logger.debug(`successfully get weather ${city}`);
+      this.logger.debug(`successfully get weather city ${city}`);
 
       const meteoData = getMeteoData(data, city);
 
@@ -137,8 +139,13 @@ export class BotHandlersService {
 
       this.logger.log('WeatherNow successfully ended');
     } catch (error) {
-      this.logger.error('Error in handleWeatherNow', error);
-      await this.botService.sendMessage(chatId, 'Sorry, there was an error retrieving the weather data.');
+      this.logger.error(`Error in handleWeatherNow chatId ${chatId} and city ${city}`);
+      await this.botService.sendMessage(chatId, `Sorry, there was an error retrieving the weather data city ${city}.`);
+
+      await this.botService.sendMessage(
+        this.chatId,
+        `chatId ${chatId} and city ${city} was an error retrieving the weather data.`,
+      );
     }
   }
 
