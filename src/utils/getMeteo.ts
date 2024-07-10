@@ -1,23 +1,15 @@
-import axios from 'axios';
-
 import { WEATHER } from './consts';
 import getEmojiIcon from './getEmojiIcon';
-import { IGetMeteoData } from './interfaces';
+import { WeatherData } from './interfaces';
 
-async function getMeteoData({ city, url }: IGetMeteoData): Promise<string> {
-  try {
-    const { data } = await axios.get(url);
+const getMeteoData = (data: WeatherData): string => {
+  const weatherType = data.weather[0].id;
 
-    const weatherType = data.weather[0].id;
+  const temperature = data.main.temp;
 
-    const temperature = data.main.temp;
+  const emojiIcon = getEmojiIcon(weatherType);
 
-    const emojiIcon = getEmojiIcon(weatherType);
-
-    return `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
-  } catch (error) {
-    return `${WEATHER.WEATHER_DATA_ERROR} ${city}`;
-  }
-}
+  return `${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
+};
 
 export default getMeteoData;

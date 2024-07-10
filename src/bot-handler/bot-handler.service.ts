@@ -1,5 +1,7 @@
+import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger, LoggerService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
 
 import { BotService } from '../bot/bot.service';
 import { CronService } from '../cron/cron.service';
@@ -7,14 +9,11 @@ import { User } from '../users/entity/users.entity';
 import { UserActions, UserState, messages } from '../users/users.constants';
 import { UsersService } from '../users/users.service';
 import { TUsersActions } from '../users/users.types';
-import { API_WEATHER, WEATHER } from '../utils/consts';
+import { API_WEATHER } from '../utils/consts';
 import delay from '../utils/delay';
 import generateCities from '../utils/generateCities';
 import generateTime from '../utils/generateTimes';
 import getMeteoData from '../utils/getMeteo';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import getEmojiIcon from 'src/utils/getEmojiIcon';
 
 @Injectable()
 export class BotHandlersService {
@@ -128,15 +127,9 @@ export class BotHandlersService {
 
       const { data } = await firstValueFrom(this.httpService.get(url));
 
-      const weatherType = data.weather[0].id;
+      const meteoData = getMeteoData(data);
 
-      const temperature = data.main.temp;
-
-      const emojiIcon = getEmojiIcon(weatherType);
-
-      const meteoData = `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
-
-      await this.botService.sendMessage(chatId, meteoData);
+      await this.botService.sendMessage(chatId, `${city} ${meteoData}`);
 
       this.logger.log('WeatherNow successfully ended');
     } catch (error) {

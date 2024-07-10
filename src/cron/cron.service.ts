@@ -1,7 +1,9 @@
+import { HttpService } from '@nestjs/axios';
 import { HttpException, HttpStatus, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
+import { firstValueFrom } from 'rxjs';
 
 import { CronRepository } from './cron.repository';
 import { CreateCronJobDto } from './dto/createCronJob.dto';
@@ -9,12 +11,9 @@ import { UpdateCronJobDto } from './dto/updateCronJob.dto';
 import { CronEntity } from './entity/cron.entity';
 import { BotService } from '../bot/bot.service';
 import { UsersService } from '../users/users.service';
-import { API_WEATHER, WEATHER, cronTimezone } from '../utils/consts';
+import { API_WEATHER, cronTimezone } from '../utils/consts';
 import getMeteoData from '../utils/getMeteo';
 import timeToCronValue from '../utils/timeToCronValue';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import getEmojiIcon from 'src/utils/getEmojiIcon';
 
 @Injectable()
 export class CronService implements OnModuleInit {
@@ -40,19 +39,17 @@ export class CronService implements OnModuleInit {
     const cityName = encodeURIComponent(city);
     const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
-    // const meteoData = await getMeteoData({ city, url });
-
     const { data } = await firstValueFrom(this.httpService.get(url));
 
-    const weatherType = data.weather[0].id;
+    const meteoData = getMeteoData(data);
 
-    const temperature = data.main.temp;
-
-    const emojiIcon = getEmojiIcon(weatherType);
-
-    const meteoData = `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
-
-    const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
+    const job = new CronJob(
+      time,
+      () => this.botService.sendMessage(chatId, `${city} ${meteoData}`),
+      null,
+      true,
+      cronTimezone,
+    );
     this.schedulerRegistry.addCronJob(chatId.toString(), job);
     this.logger.log(`Cron job scheduled with cronTime: ${time} and chatId: ${chatId}`);
   }
