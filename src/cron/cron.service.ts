@@ -42,8 +42,9 @@ export class CronService implements OnModuleInit {
     const cityName = encodeURIComponent(city);
     const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
-    this.logger.log(`run get weather ${city}`);
     try {
+      this.logger.log(`run get weather ${city}`);
+
       const { data } = await firstValueFrom(this.httpService.get(url));
 
       this.logger.debug(`successfully get weather ${city}`);
@@ -57,12 +58,12 @@ export class CronService implements OnModuleInit {
     } catch (error) {
       this.logger.error(`Error while adding cron job for chatId ${chatId}`);
 
+      await this.botService.sendMessage(chatId, `Произошла ошибка при получении погодных данных.`);
+
       await this.botService.sendMessage(
         this.chatId,
-        `chatId ${chatId} and city ${city} was an error retrieving the weather data.`,
+        `chatId ${chatId} and city ${city} Произошла ошибка при получении погодных данных.`,
       );
-
-      return;
     }
   }
 
