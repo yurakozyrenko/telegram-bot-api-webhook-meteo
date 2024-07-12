@@ -34,36 +34,46 @@ export class CronService implements OnModuleInit {
   }
 
   async addCronJob(chatId: CronEntity['chatId'], time: CronEntity['time']) {
-    this.logger.log(`trying to add cron job with time: ${time} andchatId: ${chatId}`);
+    this.logger.log(`Trying to add cron job with time: ${time} and chatId: ${chatId}`);
     time = timeToCronValue(time);
 
-    const { city } = await this.userService.findOneByChatId(chatId);
-
-    const cityName = encodeURIComponent(city);
-    const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
-
     try {
-      this.logger.log(`run get weather ${city}`);
+      const { city } = await this.userService.findOneByChatId(chatId);
 
-      const { data } = await firstValueFrom(this.httpService.get(url));
+      const cityName = encodeURIComponent(city);
+      const url = `${API_WEATHER.BASE_URL}?q=${cityName}&units=${API_WEATHER.UNITS}&appid=${this.apiKey}`;
 
-      this.logger.debug(`successfully get weather ${city}`);
+      const job = new CronJob(
+        time,
+        async () => {
+          try {
+            this.logger.log(`Run get weather ${city}`);
 
-      const meteoData = getMeteoData(data, city);
+            const { data } = await firstValueFrom(this.httpService.get(url));
+            this.logger.debug(`Successfully get weather ${city}`);
 
-      const job = new CronJob(time, () => this.botService.sendMessage(chatId, meteoData), null, true, cronTimezone);
+            const meteoData = getMeteoData(data, city);
+            this.botService.sendMessage(chatId, meteoData);
+
+            this.logger.log(`Message sent for chatId ${chatId}`);
+          } catch (error) {
+            this.logger.error(`Error while getting weather data for chatId ${chatId}: ${error.message}`);
+
+            await this.botService.sendMessage(chatId, `Произошла ошибка при получении погодных данных.`);
+          }
+        },
+        null,
+        true,
+        cronTimezone,
+      );
+
       this.schedulerRegistry.addCronJob(chatId.toString(), job);
 
       this.logger.log(`Cron job scheduled with cronTime: ${time} and chatId: ${chatId}`);
     } catch (error) {
-      this.logger.error(`Error while adding cron job for chatId ${chatId}`);
+      this.logger.error(`Error while adding cron job for chatId ${chatId}: ${error.message}`);
 
-      await this.botService.sendMessage(chatId, `Произошла ошибка при получении погодных данных.`);
-
-      await this.botService.sendMessage(
-        this.chatId,
-        `chatId ${chatId} and city ${city} Произошла ошибка при получении погодных данных.`,
-      );
+      await this.botService.sendMessage(chatId, `Произошла ошибка при добавлении задачи Cron.`);
     }
   }
 

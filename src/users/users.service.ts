@@ -4,11 +4,21 @@ import { CreateUserDto } from './dto/createUser.dto';
 import { UpdateUserDto } from './dto/updateUser.dto';
 import { User } from './entity/users.entity';
 import { UsersRepository } from './users.repository';
+import { BotService } from 'src/bot/bot.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
-  constructor(private readonly usersRepository: UsersRepository) {}
+  private readonly chatId: number;
+
+  constructor(
+    private readonly usersRepository: UsersRepository,
+    private readonly bot: BotService,
+    private readonly configService: ConfigService,
+  ) {
+    this.chatId = this.configService.get('CHAT_ID_ALERT');
+  }
 
   async findOneByChatId(chatId: User['chatId']): Promise<User> {
     this.logger.log(`Trying to user info by chatId: ${chatId}`);
@@ -17,7 +27,10 @@ export class UsersService {
 
     if (!existingUser) {
       this.logger.debug(`user with chatId: ${chatId} not found`);
+      this.bot.sendMessage(this.chatId, `New user with chatId: ${chatId}`);
     }
+
+    this.logger.debug(`user successfully get by chatId: ${chatId}`);
 
     return existingUser;
   }
@@ -31,6 +44,7 @@ export class UsersService {
 
     if (user) {
       this.logger.error(`user with chatId ${chatId} already exists`);
+      this.bot.sendMessage(this.chatId, `user with chatId: ${chatId} already exist`);
       throw new HttpException(`user with chatId: ${chatId} already exist`, HttpStatus.BAD_REQUEST);
     }
 
@@ -50,6 +64,7 @@ export class UsersService {
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
+      this.bot.sendMessage(this.chatId, `user with chatId: ${chatId} not exist`);
       throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 
@@ -67,6 +82,7 @@ export class UsersService {
 
     if (!user) {
       this.logger.error(`user with chatId: ${chatId} not exist`);
+      this.bot.sendMessage(this.chatId, 'user with chatId: ${chatId} not exist');
       throw new HttpException(`user with chatId: ${chatId} not exist`, HttpStatus.BAD_REQUEST);
     }
 

@@ -140,11 +140,11 @@ export class BotHandlersService {
       this.logger.log('WeatherNow successfully ended');
     } catch (error) {
       this.logger.error(`Error in handleWeatherNow chatId ${chatId} and city ${city}`);
-      await this.botService.sendMessage(chatId, `Sorry, there was an error retrieving the weather data city ${city}.`);
+      await this.botService.sendMessage(chatId, `Произошла ошибка при получении погодных данных.`);
 
       await this.botService.sendMessage(
         this.chatId,
-        `chatId ${chatId} and city ${city} was an error retrieving the weather data.`,
+        `chatId ${chatId} and city ${city} при получении данных о погоде произошла ошибка.`,
       );
     }
   }
