@@ -1,12 +1,12 @@
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 
 import { BotProvider } from './bot.provider';
 import { BotService } from './bot.service';
 import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [HttpModule, UsersModule],
+  imports: [HttpModule, forwardRef(() => UsersModule)],
   providers: [BotService, BotProvider],
   exports: [BotService],
 })

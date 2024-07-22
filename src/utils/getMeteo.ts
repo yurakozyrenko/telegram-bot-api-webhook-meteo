@@ -1,25 +1,15 @@
-import axios from 'axios';
-
+import { WEATHER } from './consts';
 import getEmojiIcon from './getEmojiIcon';
+import { IWeatherData } from './interfaces';
 
-async function getMeteoData(message: string): Promise<string> {
-  try {
-    const cityName = encodeURIComponent(message);
+const getMeteoData = (data: IWeatherData, city: string): string => {
+  const weatherType = data.weather[0].id;
 
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&&units=metric&&appid=${process.env.API_KEY}`;
+  const temperature = data.main.temp;
 
-    const { data } = await axios.get(url);
+  const emojiIcon = getEmojiIcon(weatherType);
 
-    const weatherType = data.weather[0].id;
-
-    const temtemperature = data.main.temp;
-
-    const emojiIcon = getEmojiIcon(weatherType);
-
-    return `Погода ${message} ${emojiIcon} ${temtemperature} град C`;
-  } catch (error) {
-    return `Ошибка при получении данных о погоде в городе ${message}`;
-  }
-}
+  return `${city} ${emojiIcon} ${temperature} ${WEATHER.TEMPERATURE_UNIT}`;
+};
 
 export default getMeteoData;

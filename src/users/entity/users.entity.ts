@@ -18,6 +18,6 @@ export class User {
   @Column({ type: 'varchar', length: 20, nullable: true })
   city: string;
 
-  @Column({ type: 'enum', enum: UserState, default: 'start' })
+  @Column({ type: 'enum', enum: UserState, default: null })
   userState: UserState;
 }

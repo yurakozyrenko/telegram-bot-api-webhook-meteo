@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -8,7 +9,7 @@ import { BotModule } from '../bot/bot.module';
 import { UsersModule } from '../users/users.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([CronEntity]), BotModule, UsersModule],
+  imports: [TypeOrmModule.forFeature([CronEntity]), BotModule, UsersModule, HttpModule],
   providers: [CronService, CronRepository],
   exports: [CronService],
 })
